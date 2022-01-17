@@ -6,6 +6,11 @@ import {
 
 const Response = (event: APIGatewayProxyEventV2, context: APIGatewayEventRequestContextV2): APIGatewayProxyStructuredResultV2 => {
 
+    let isBase64Encoded: Boolean = false
+    let statusCode: Number = 200
+    let body: any = {}
+    let headers: Object = {}
+
     // Default response
     let lambdaResponse = {
         "isBase64Encoded": false,
@@ -16,7 +21,7 @@ const Response = (event: APIGatewayProxyEventV2, context: APIGatewayEventRequest
         }
     }
 
-    // Response API
+    // Public response API
     // TODO: Create functions to update response functions
     const response = {
         statusCode: (statusCode: Number): any => lambdaResponse,

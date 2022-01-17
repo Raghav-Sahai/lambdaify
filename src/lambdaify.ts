@@ -9,7 +9,7 @@ import { Router } from './Router'
 
 const { log, error } = console
 
-const lambdaify = (options: any) => {
+const lambdaify = (options: Object) => {
 
     options = options || {}
     if (typeof options !== 'object') {
@@ -29,21 +29,21 @@ const lambdaify = (options: any) => {
             const callback: Function = router.getCallback(event)
             await handleRun(event, context, callback)
         },
-        get: (path: String, callback: Function):any => {
+        get: ( path: String, callback: Function):any => {
             log('get')
-            router.registerRoute(path, callback)
+            router.registerRoute('GET', path, callback)
         },
         put: (path: String, callback: Function):any => {
             log('put')
-            router.registerRoute(path, callback)
+            router.registerRoute('PUT', path, callback)
         },
         post: (path: String, callback: Function):any => {
             log('post')
-            router.registerRoute(path, callback)
+            router.registerRoute('POST', path, callback)
         },
         delete: (path: String, callback: Function):any => {
             log('delete')
-            router.registerRoute(path, callback)
+            router.registerRoute('DELETE', path, callback)
         },
     }    
 

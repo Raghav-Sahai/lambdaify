@@ -3,7 +3,7 @@ import {
 } from 'aws-lambda';
 
 const Request = (event:APIGatewayProxyEventV2): any => {
-    // Request API
+    // Public request API
     const request = {
         body: () => event.body || undefined,
         headers: () => event.headers,
