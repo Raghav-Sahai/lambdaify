@@ -8,6 +8,7 @@ const lambdaify = require('../lib/lambdaify')()
 //     return await lambdaify.run(event, context);
 // };
 
-lambdaify.run()
-lambdaify.put()
-lambdaify.get()
+// lambdaify.run()
+// lambdaify.put()
+lambdaify.get('/test/path/:id', (req, res) => console.log('test'))
+lambdaify.router()

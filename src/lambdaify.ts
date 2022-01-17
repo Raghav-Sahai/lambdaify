@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda';
 import { Request } from './Request'
 import { Response } from './Response'
-import { Router } from './Router'
+import { router } from './Router'
 
 const { log, error } = console
 
@@ -16,7 +16,7 @@ const lambdaify = (options: Object) => {
         throw new TypeError('Options must be an object')
     }
 
-    const router = Router()
+    const Router = router()
 
     //Public API
     const lambdaify = {
@@ -26,25 +26,26 @@ const lambdaify = (options: Object) => {
             log('run')
 
             // Find route in router, Return callback
-            const callback: Function = router.getCallback(event)
+            const callback: Function = Router.getCallback(event)
             await handleRun(event, context, callback)
         },
         get: ( path: String, callback: Function):any => {
             log('get')
-            router.registerRoute('GET', path, callback)
+            Router.registerRoute('GET', path, callback)
         },
         put: (path: String, callback: Function):any => {
             log('put')
-            router.registerRoute('PUT', path, callback)
+            Router.registerRoute('PUT', path, callback)
         },
         post: (path: String, callback: Function):any => {
             log('post')
-            router.registerRoute('POST', path, callback)
+            Router.registerRoute('POST', path, callback)
         },
         delete: (path: String, callback: Function):any => {
             log('delete')
-            router.registerRoute('DELETE', path, callback)
+            Router.registerRoute('DELETE', path, callback)
         },
+        router: () => Router.getRouter() // For test purposes
     }    
 
     return lambdaify
