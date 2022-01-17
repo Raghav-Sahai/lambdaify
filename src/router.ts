@@ -1,5 +1,6 @@
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
-import { parsePath } from './utils/parsePath'
+import { parsePath } from './utils/parsePath';
+import { findRoute } from './utils/findRoute'
 
 interface Param {
     key: String,
@@ -8,6 +9,7 @@ interface Param {
 interface Route {
     method: Method,
     path: String,
+    pathArray: Array<string>
     fragmentLength: Number,
     params: RouteParams,
     nonParamsIndex: Array<Number>,
@@ -23,25 +25,33 @@ const router = (): any => {
     // Private router API
     return {
         registerRoute: (method: Method, path: String, callback: Function ): Router => {
-            const { fragmentLength, params, nonParamsIndex } = parsePath(path)
+            const { fragmentLength, params, nonParamsIndex, pathArray } = parsePath(path)
             const route: Route = {
                 method,
-                callback,
                 path,
+                pathArray,
                 fragmentLength,
                 params,
-                nonParamsIndex
+                nonParamsIndex,
+                callback
             }
             router.push(route)
             return router
         },
-        getCallback: (event: APIGatewayProxyEventV2): Function => () => {},
-        getRouter: () => console.log(router) // Here for test purposes
+        getCallback: (event: APIGatewayProxyEventV2): any => {
+            const incomingPath = event.requestContext.http.path
+            const incomingMethod = event.requestContext.http.method
+            const { fragmentLength, nonParamsIndex, pathArray } = parsePath(incomingPath)
+            const callback = findRoute(router, fragmentLength, nonParamsIndex, pathArray, incomingMethod as Method)
+        },
+        getRouter: () => console.log(JSON.stringify(router)) // Here for test purposes
     }
 }
 
 export { 
     router,
     Param,
-    RouteParams
+    RouteParams,
+    Router,
+    Method
  }
