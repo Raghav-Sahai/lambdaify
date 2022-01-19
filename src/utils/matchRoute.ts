@@ -14,11 +14,13 @@ const matchRoute = (router: Router, incomingPath: String, incomingMethod: Method
     const incomingPathArray = getPathArray(incomingPath)
 
     for (const route of filteredRoutes) {
+
         const refIncomingPathArray = [...incomingPathArray];
         (route.params).forEach(param => {
             route.pathArray[param.index] = '__var__' // May have to make local copy
             refIncomingPathArray[param.index] = '__var__' // May have to make local copy
         })
+
         if (route.pathArray === refIncomingPathArray) return route    
     }
 
