@@ -41,9 +41,9 @@ const router = (): any => {
             const incomingMethod = event.requestContext.http.method
             const matchedRoute = matchRoute(router, incomingPath, incomingMethod as Method)
 
-            if (!matchRoute) throw routeNotFound
+            if (!matchedRoute) throw routeNotFound
 
-            return matchRoute
+            return matchedRoute
         },
         getRouter: () => console.log(JSON.stringify(router)) // Here for test purposes
     }
