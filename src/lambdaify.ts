@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda';
 import { Request } from './Request'
 import { Response } from './Response'
-import { router } from './Router'
+import { router, Route } from './Router'
 
 const { log, error } = console
 
@@ -26,7 +26,9 @@ const lambdaify = (options: Object) => {
             log('run')
 
             // Find route in router, Return callback
-            const callback: Function = Router.getCallback(event)
+            // TODO: handle error case if no route is found, func throws error...
+            const matchedRoute: Route = Router.matchedRoute(event)
+            const { callback } = matchedRoute
             await handleRun(event, context, callback)
         },
         get: ( path: String, callback: Function):any => {

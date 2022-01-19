@@ -1,23 +1,23 @@
 import { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { parsePath } from './utils/parsePath';
-import { findRoute } from './utils/findRoute'
+import { matchRoute } from './utils/matchRoute'
 
 interface Param {
     key: String,
-    index: Number
+    index: number
 }
 interface Route {
     method: Method,
     path: String,
     pathArray: Array<string>
-    fragmentLength: Number,
     params: RouteParams,
-    nonParamsIndex: Array<Number>,
     callback: Function
 }
 type Method = 'GET' | 'PUT' | 'POST' | 'DELETE'
 interface RouteParams extends Array<Param>{}
 interface Router extends Array<Route>{}
+
+const routeNotFound = new Error('This route does not exist')
 
 const router = (): any => {
     let router: Router = []
@@ -25,24 +25,25 @@ const router = (): any => {
     // Private router API
     return {
         registerRoute: (method: Method, path: String, callback: Function ): Router => {
-            const { fragmentLength, params, nonParamsIndex, pathArray } = parsePath(path)
+            const { params, pathArray } = parsePath(path)
             const route: Route = {
                 method,
                 path,
                 pathArray,
-                fragmentLength,
                 params,
-                nonParamsIndex,
                 callback
             }
             router.push(route)
             return router
         },
-        getCallback: (event: APIGatewayProxyEventV2): any => {
+        matchedRoute: (event: APIGatewayProxyEventV2): any => {
             const incomingPath = event.requestContext.http.path
             const incomingMethod = event.requestContext.http.method
-            const { fragmentLength, nonParamsIndex, pathArray } = parsePath(incomingPath)
-            const callback = findRoute(router, fragmentLength, nonParamsIndex, pathArray, incomingMethod as Method)
+            const matchedRoute = matchRoute(router, incomingPath, incomingMethod as Method)
+
+            if (!matchRoute) throw routeNotFound
+
+            return matchRoute
         },
         getRouter: () => console.log(JSON.stringify(router)) // Here for test purposes
     }
@@ -53,5 +54,6 @@ export {
     Param,
     RouteParams,
     Router,
+    Route,
     Method
  }
