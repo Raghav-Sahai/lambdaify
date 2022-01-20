@@ -1,7 +1,7 @@
-import { Router, Method, Route } from '../Router'
+import { Router, Method, Route } from '../types/Router.types'
 import { getPathArray } from './parsePath'
 
-const matchRoute = (router: Router, incomingPath: String, incomingMethod: Method): Route | [] => {
+const matchRoute = (router: Router, incomingPath: String, incomingMethod: Method): Route | {} => {
 
     // Filter for method
     const filteredRoutes: Router = router.filter( route => 
@@ -9,7 +9,7 @@ const matchRoute = (router: Router, incomingPath: String, incomingMethod: Method
     )
     
     // IF no matches, return throw error
-    if (filteredRoutes.length === 0) return []
+    if (filteredRoutes.length === 0) return {}
 
     const incomingPathArray = getPathArray(incomingPath)
 
@@ -24,7 +24,7 @@ const matchRoute = (router: Router, incomingPath: String, incomingMethod: Method
         if (route.pathArray === refIncomingPathArray) return route    
     }
 
-    return []
+    return {}
 }
 
 export { matchRoute }

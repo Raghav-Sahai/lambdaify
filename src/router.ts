@@ -1,23 +1,10 @@
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import {
+    Method,
+    Route,
+    Router
+} from './types/Router.types'
 import { parsePath } from './utils/parsePath';
 import { matchRoute } from './utils/matchRoute'
-
-interface Param {
-    key: String,
-    index: number
-}
-interface Route {
-    method: Method,
-    path: String,
-    pathArray: Array<string>
-    params: RouteParams,
-    callback: Function
-}
-type Method = 'GET' | 'PUT' | 'POST' | 'DELETE'
-interface RouteParams extends Array<Param>{}
-interface Router extends Array<Route>{}
-
-const routeNotFound = new Error('This route does not exist')
 
 const router = (): any => {
     let router: Router = []
@@ -36,12 +23,10 @@ const router = (): any => {
             router.push(route)
             return router
         },
-        matchedRoute: (event: APIGatewayProxyEventV2): any => {
-            const incomingPath = event.requestContext.http.path
-            const incomingMethod = event.requestContext.http.method
+        matchedRoute: (method: Method, path: String): Route | {} => {
+            const incomingPath = path
+            const incomingMethod = method
             const matchedRoute = matchRoute(router, incomingPath, incomingMethod as Method)
-
-            if (!matchedRoute) throw routeNotFound
 
             return matchedRoute
         },
@@ -49,11 +34,4 @@ const router = (): any => {
     }
 }
 
-export { 
-    router,
-    Param,
-    RouteParams,
-    Router,
-    Route,
-    Method
- }
+export { router }

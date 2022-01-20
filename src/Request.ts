@@ -1,8 +1,9 @@
 import {
     APIGatewayProxyEventV2,
+    APIGatewayEventRequestContextV2
 } from 'aws-lambda';
 
-const Request = (event:APIGatewayProxyEventV2): any => {
+const Request = (event:APIGatewayProxyEventV2, context: APIGatewayEventRequestContextV2, params: any): any => {
     // Public request API
     const request = {
         body: () => event.body || undefined,
