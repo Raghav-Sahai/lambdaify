@@ -7,8 +7,8 @@ import { router } from './Router'
 import { Route, RouteParams } from './types/Router.types'
 import { standardizeEvent, StandardizedEvent } from './utils/standardizeEvent'
 
-
 const { log, error } = console
+
 const routeNotFound = new Error('This route does not exist')
 const unexpectedError = new Error('Unexpected error')
 
@@ -46,9 +46,9 @@ const lambdaify = (options: Object) => {
 
             try {
                 await handleRun(standardEvent, context, callback, params)
-            } catch (error) {
+            } catch (err) {
                 // TODO: Need to have this return some kind of error response
-                error(error)
+                error(err)
                 throw unexpectedError
             }
         },
@@ -81,10 +81,11 @@ const handleRun = async (event: StandardizedEvent, context: APIGatewayEventReque
     const response = Response(event, context)
     try {
         return await callback(request, response)
-    } catch (error) {
+    } catch (err) {
 
         // TODO: Need to have this return some kind of error response
-        throw error
+        error(err)
+        throw err
     }
 
 }
