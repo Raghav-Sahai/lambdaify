@@ -4,8 +4,10 @@ import {
 } from '../types/Router.types'
 
 const parsePath = (rawPath: String): { params: RouteParams, pathArray: Array<string> } => {
+
+    // Extract path information
     const pathArray = getPathArray(rawPath)
-    const { params } = extractParams(pathArray)
+    const params = getParams(pathArray)
 
     return { params, pathArray }
 }
@@ -18,7 +20,7 @@ const getPathArray = (rawPath: String): Array<string> => {
             .split('/')
         : [];
 }
-const extractParams = (pathArray: Array<string>): { params: RouteParams } => {
+const getParams = (pathArray: Array<string>): RouteParams => {
     let params: RouteParams = []
 
     pathArray.forEach((fragment, index) => {
@@ -31,7 +33,7 @@ const extractParams = (pathArray: Array<string>): { params: RouteParams } => {
         }
     })
     
-    return { params }
+    return params
 }
 
 export { parsePath, getPathArray }

@@ -1,12 +1,11 @@
 import {
-    APIGatewayProxyEventV2,
     APIGatewayEventRequestContextV2,
-    APIGatewayProxyStructuredResultV2
 } from 'aws-lambda';
 import { Request } from './Request'
 import { Response } from './Response'
 import { router } from './Router'
 import { Route, RouteParams } from './types/Router.types'
+import { standardizeEvent, StandardizedEvent } from './utils/standardizeEvent'
 
 
 const { log, error } = console
@@ -17,7 +16,7 @@ const lambdaify = (options: Object) => {
 
     options = options || {}
     if (typeof options !== 'object') {
-        throw new TypeError('Options must be an object')
+        throw new Error('Options must be an object')
     }
 
     // Initialize router
@@ -26,13 +25,18 @@ const lambdaify = (options: Object) => {
     //Public API
     const lambdaify = {
 
-        // TODO: replace any with 'APIGatewayProxyStructuredResultV2'
         // TODO: Have this be either APIGateway v1, v2, or alb
-        run: async (event: APIGatewayProxyEventV2, context: APIGatewayEventRequestContextV2):Promise<any> => {
+        run: async (event: any, context: any):Promise<any> => {
             log('run')
 
-            // Find route in router, Return callback
-            const matchedRoute: Route = Router.matchedRoute(event)
+            // Standardize event
+            const standardEvent: StandardizedEvent = standardizeEvent(event)
+
+            // Extract method and path from event
+            const { method, path } = standardEvent
+
+            // Find route in router, return matched route
+            const matchedRoute: Route = Router.matchedRoute(method, path)
 
             // TODO: Need to have this return 404 response
             if (!matchedRoute) throw routeNotFound
@@ -40,11 +44,8 @@ const lambdaify = (options: Object) => {
             // Extract route callback and params object
             const { callback, params } = matchedRoute
 
-            // TODO: Create standardization logic
-            // const { standardEvent, standardContext } = standardizeEvent(event, context)
-
             try {
-                await handleRun(event, context, callback, params)
+                await handleRun(standardEvent, context, callback, params)
             } catch (error) {
                 // TODO: Need to have this return some kind of error response
                 error(error)
@@ -73,7 +74,7 @@ const lambdaify = (options: Object) => {
     return lambdaify
 }
 
-const handleRun = async (event: APIGatewayProxyEventV2, context: APIGatewayEventRequestContextV2, callback: Function, params: RouteParams): Promise<any> => {
+const handleRun = async (event: StandardizedEvent, context: APIGatewayEventRequestContextV2, callback: Function, params: RouteParams): Promise<any> => {
     log('handleRun')
 
     const request = Request(event, context, params)

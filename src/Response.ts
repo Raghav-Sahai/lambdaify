@@ -1,10 +1,10 @@
 import {
-    APIGatewayProxyEventV2,
     APIGatewayEventRequestContextV2,
     APIGatewayProxyStructuredResultV2
 } from 'aws-lambda';
+import { StandardizedEvent } from './utils/standardizeEvent'
 
-const Response = (event: APIGatewayProxyEventV2, context: APIGatewayEventRequestContextV2): APIGatewayProxyStructuredResultV2 => {
+const Response = (event: StandardizedEvent, context: APIGatewayEventRequestContextV2): APIGatewayProxyStructuredResultV2 => {
 
     let isBase64Encoded: Boolean = false
     let statusCode: Number = 200
