@@ -11,7 +11,7 @@ const router = (): any => {
 
     // Private router API
     return {
-        registerRoute: (method: Method, path: String, callback: Function ): Router => {
+        registerRoute: (method: Method, path: string, callback: Function ): Router => {
             const { params, pathArray } = parsePath(path)
             const route: Route = {
                 method,
@@ -23,7 +23,7 @@ const router = (): any => {
             router.push(route)
             return router
         },
-        matchedRoute: (method: Method, path: String): Route | {} => {
+        matchedRoute: (method: Method, path: string): Route | {} => {
             const incomingPath = path
             const incomingMethod = method
             const matchedRoute = matchRoute(router, incomingPath, incomingMethod as Method)

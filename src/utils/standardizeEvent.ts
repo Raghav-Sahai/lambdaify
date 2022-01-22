@@ -12,7 +12,7 @@ interface StandardizedEvent {
     headers?: Object,
     isBase64Encoded: boolean
     body?: any
-    queryStringParameters?: Object | null
+    querystringParameters?: Object | null
 }
 
 const unrecognizedEventTypeError = new Error("Unrecognized event type")
@@ -47,7 +47,7 @@ const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
     const path = event.path
     const headers = event.headers
     const isBase64Encoded = event.isBase64Encoded
-    const queryStringParameters = event.queryStringParameters
+    const querystringParameters = event.queryStringParameters
 
     return {
         payloadVersion,
@@ -55,7 +55,7 @@ const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
         path,
         headers,
         isBase64Encoded,
-        queryStringParameters
+        querystringParameters
     }
 }
 
@@ -65,7 +65,7 @@ const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedE
     const path = event.requestContext.http.path
     const headers = event.headers
     const isBase64Encoded = event.isBase64Encoded
-    const queryStringParameters = event.queryStringParameters
+    const querystringParameters = event.queryStringParameters
 
     return {
         payloadVersion,
@@ -73,7 +73,7 @@ const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedE
         path,
         headers,
         isBase64Encoded,
-        queryStringParameters
+        querystringParameters
     }
 }
 
@@ -83,7 +83,7 @@ const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEve
     const path = event.path
     const headers = event.headers
     const isBase64Encoded = event.isBase64Encoded
-    const queryStringParameters = event.queryStringParameters
+    const querystringParameters = event.queryStringParameters
     
     return {
         payloadVersion,
@@ -91,7 +91,7 @@ const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEve
         path,
         headers,
         isBase64Encoded,
-        queryStringParameters
+        querystringParameters
     }
 }
 

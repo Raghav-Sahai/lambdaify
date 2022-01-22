@@ -52,19 +52,19 @@ const lambdaify = (options: Object) => {
                 throw unexpectedError
             }
         },
-        get: ( path: String, callback: Function):any => {
+        get: ( path: string, callback: Function):any => {
             log('get')
             Router.registerRoute('GET', path, callback)
         },
-        put: (path: String, callback: Function):any => {
+        put: (path: string, callback: Function):any => {
             log('put')
             Router.registerRoute('PUT', path, callback)
         },
-        post: (path: String, callback: Function):any => {
+        post: (path: string, callback: Function):any => {
             log('post')
             Router.registerRoute('POST', path, callback)
         },
-        delete: (path: String, callback: Function):any => {
+        delete: (path: string, callback: Function):any => {
             log('delete')
             Router.registerRoute('DELETE', path, callback)
         },

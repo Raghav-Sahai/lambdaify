@@ -1,10 +1,10 @@
 interface Param {
-    key: String,
+    key: string,
     index: number
 }
 interface Route {
     method: Method,
-    path: String,
+    path: string,
     pathArray: Array<string>
     params: RouteParams,
     callback: Function

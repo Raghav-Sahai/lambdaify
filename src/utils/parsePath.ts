@@ -3,7 +3,7 @@ import {
     RouteParams
 } from '../types/Router.types'
 
-const parsePath = (rawPath: String): { params: RouteParams, pathArray: Array<string> } => {
+const parsePath = (rawPath: string): { params: RouteParams, pathArray: Array<string> } => {
 
     // Extract path information
     const pathArray = getPathArray(rawPath)
@@ -11,7 +11,7 @@ const parsePath = (rawPath: String): { params: RouteParams, pathArray: Array<str
 
     return { params, pathArray }
 }
-const getPathArray = (rawPath: String): Array<string> => {
+const getPathArray = (rawPath: string): Array<string> => {
     return rawPath
         ? rawPath
             .trim()

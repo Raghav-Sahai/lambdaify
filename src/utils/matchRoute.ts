@@ -1,7 +1,7 @@
 import { Router, Method, Route } from '../types/Router.types'
 import { getPathArray } from './parsePath'
 
-const matchRoute = (router: Router, incomingPath: String, incomingMethod: Method): Route | {} => {
+const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method): Route | {} => {
 
     // Filter for method
     const filteredRoutes: Router = router.filter( route => 
