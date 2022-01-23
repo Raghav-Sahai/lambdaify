@@ -1,6 +1,5 @@
 const lambdaify = require('../lib/lambdaify')()
 
-
 const event = {
     httpMethod: 'GET',
     path: '/get',

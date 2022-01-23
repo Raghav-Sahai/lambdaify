@@ -74,7 +74,12 @@ const lambdaify = (options: Object) => {
     return lambdaify
 }
 
-const handleRun = async (event: StandardizedEvent, context: APIGatewayEventRequestContextV2, callback: Function, params: RouteParams): Promise<any> => {
+const handleRun = async (
+    event: StandardizedEvent,
+    context: APIGatewayEventRequestContextV2,
+    callback: Function,
+    params: RouteParams
+    ): Promise<any> => {
     log('lambdaify::handleRun()')
 
     const request = Request(event, context, params)

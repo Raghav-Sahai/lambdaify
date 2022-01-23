@@ -3,7 +3,10 @@ import { StandardizedEvent } from './utils/standardizeEvent'
 import { RouteParams } from './types/Router.types'
 import { getPathArray } from './utils/parsePath'
 
-const Request = (event:StandardizedEvent, context: APIGatewayEventRequestContextV2, params: RouteParams): any => {
+const Request = (
+    event:StandardizedEvent,
+    context: APIGatewayEventRequestContextV2,
+    params: RouteParams): any => {
     const paramsObject = parseParams(event.path, params)
     // Public request API
     const request = {

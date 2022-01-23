@@ -3,7 +3,6 @@ import {
     APIGatewayProxyStructuredResultV2
 } from 'aws-lambda';
 import { StandardizedEvent } from './utils/standardizeEvent'
-import { json } from 'stream/consumers';
 
 const Response = (event: StandardizedEvent, context: APIGatewayEventRequestContextV2): any => {
 
