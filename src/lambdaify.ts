@@ -44,6 +44,7 @@ const lambdaify = (options: Object) => {
             // Extract route callback and params object
             const { callback, params } = matchedRoute
 
+
             try {
                 await handleRun(standardEvent, context, callback, params)
             } catch (err) {

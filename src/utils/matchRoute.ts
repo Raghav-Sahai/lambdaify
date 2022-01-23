@@ -1,4 +1,8 @@
-import { Router, Method, Route } from '../types/Router.types'
+import { 
+    Router,
+    Method, 
+    Route 
+} from '../types/Router.types'
 import { getPathArray } from './parsePath'
 
 const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method): Route | {} => {

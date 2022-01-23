@@ -7,7 +7,10 @@ const Request = (
     event:StandardizedEvent,
     context: APIGatewayEventRequestContextV2,
     params: RouteParams): any => {
+
+    // Extract params    
     const paramsObject = parseParams(event.path, params)
+    
     // Public request API
     const request = {
         version: event.payloadVersion,

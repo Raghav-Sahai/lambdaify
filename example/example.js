@@ -2,7 +2,7 @@ const lambdaify = require('../lib/lambdaify')()
 
 const event = {
     httpMethod: 'GET',
-    path: '/get',
+    path: '/get/1234',
     body: 'event body',
     headers: {
         'header': 'testHeader'
@@ -23,11 +23,17 @@ const context = {}
 //     return await lambdaify.run(event, context);
 // };
 
-lambdaify.get('/get', (req, res) => {
+lambdaify.get('/get/:id', (req, res) => {
     console.log('example::get')
     console.log('req.body', req.body)
     console.log('req.headers', req.headers)
+    console.log('req.params', req.params)
     return res.send({body: 'test body'})
 })
 // lambdaify.router()
-lambdaify.run(event, context)
+const run = async () => {
+    const response = await lambdaify.run(event, context)
+    console.log(response)
+}
+
+run()
