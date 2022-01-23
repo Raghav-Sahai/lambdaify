@@ -7,14 +7,14 @@ const Request = (event:StandardizedEvent, context: APIGatewayEventRequestContext
     const paramsObject = parseParams(event.path, params)
     // Public request API
     const request = {
-        version: () => event.payloadVersion,
-        body: () => event.body,
-        headers: () => event.headers,
-        path: () => event.path,
-        method: () => event.method,
-        isBase64Encoded: () => event.isBase64Encoded,
-        querystringParameters: () => event.querystringParameters,
-        params: () => paramsObject
+        version: event.payloadVersion,
+        body: event.body,
+        headers: event.headers,
+        path: event.path,
+        method: event.method,
+        isBase64Encoded: event.isBase64Encoded,
+        querystringParameters: event.querystringParameters,
+        params: paramsObject
     }
     return request
 }

@@ -27,7 +27,7 @@ const lambdaify = (options: Object) => {
 
         // TODO: Have this be either APIGateway v1, v2, or alb
         run: async (event: any, context: any):Promise<any> => {
-            log('run')
+            log('lambdaify::run()')
 
             // Standardize event
             const standardEvent: StandardizedEvent = standardizeEvent(event)
@@ -53,19 +53,19 @@ const lambdaify = (options: Object) => {
             }
         },
         get: ( path: string, callback: Function):any => {
-            log('get')
+            log('lambdaify::get()')
             Router.registerRoute('GET', path, callback)
         },
         put: (path: string, callback: Function):any => {
-            log('put')
+            log('lambdaify::put()')
             Router.registerRoute('PUT', path, callback)
         },
         post: (path: string, callback: Function):any => {
-            log('post')
+            log('lambdaify::post()')
             Router.registerRoute('POST', path, callback)
         },
         delete: (path: string, callback: Function):any => {
-            log('delete')
+            log('lambdaify::delete()')
             Router.registerRoute('DELETE', path, callback)
         },
         router: () => Router.getRouter() // For test purposes
@@ -75,7 +75,7 @@ const lambdaify = (options: Object) => {
 }
 
 const handleRun = async (event: StandardizedEvent, context: APIGatewayEventRequestContextV2, callback: Function, params: RouteParams): Promise<any> => {
-    log('handleRun')
+    log('lambdaify::handleRun()')
 
     const request = Request(event, context, params)
     const response = Response(event, context)
