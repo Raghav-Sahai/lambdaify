@@ -12,7 +12,6 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
     let body: any = ''
 
     // Public response API
-    // TODO: Create functions to update response functions
     const response = {
         status: (code: number): any => setStatusCode(code),
         header: (key: string, value: string): any => setHeader(key, value),
@@ -33,8 +32,8 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
         return createResponse()
     }
 
-    const setBody = (body: any) => {
-        body = JSON.stringify(body)
+    const setBody = (_body: any) => {
+        body = JSON.stringify(_body)
         return createResponse()
     }
 

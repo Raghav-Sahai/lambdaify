@@ -28,12 +28,13 @@ lambdaify.get('/get/:id', (req, res) => {
     console.log('req.body', req.body)
     console.log('req.headers', req.headers)
     console.log('req.params', req.params)
-    return res.send({body: 'test body'})
+    res.header('headerKey', 'headerValue')
+    return res.send('test body')
 })
 // lambdaify.router()
 const run = async () => {
     const response = await lambdaify.run(event, context)
-    console.log(response)
+    console.log('example::response', response)
 }
 
 run()

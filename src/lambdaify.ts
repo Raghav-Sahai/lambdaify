@@ -44,9 +44,9 @@ const lambdaify = (options: Object) => {
             // Extract route callback and params object
             const { callback, params } = matchedRoute
 
-
             try {
-                await handleRun(standardEvent, context, callback, params)
+                return await handleRun(standardEvent, context, callback, params)
+                
             } catch (err) {
                 // TODO: Need to have this return some kind of error response
                 error(err)
@@ -83,10 +83,13 @@ const handleRun = async (
     ): Promise<any> => {
     log('lambdaify::handleRun()')
 
+    // Create request and response references
     const request = Request(event, context, params)
     const response = Response(event, context)
+
     try {
         return await callback(request, response)
+
     } catch (err) {
 
         // TODO: Need to have this return some kind of error response
