@@ -2,7 +2,7 @@ import {
     Method,
     Route,
     Router
-} from './types/Router.types'
+} from './types/types'
 import { parsePath } from './utils/parsePath';
 import { matchRoute } from './utils/matchRoute'
 

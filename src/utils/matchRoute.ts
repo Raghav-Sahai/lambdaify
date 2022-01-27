@@ -2,26 +2,21 @@ import {
     Router,
     Method, 
     Route 
-} from '../types/Router.types'
+} from '../types/types'
 import { getPathArray } from './parsePath'
 
 const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method): Route | {} => {
-
-    // Filter for method
-    const filteredRoutes: Router = router.filter( route => 
-        route.method === incomingMethod
-    )
     
     // If no matches, return throw error
-    if (filteredRoutes.length === 0) return {}
+    if (!router) return {}
 
     // Get path arry for the incoming path
     const incomingPathArray = getPathArray(incomingPath)
 
-    for (let route of filteredRoutes) {
+    for (let route of router) {
 
         // Extract pathArray and params from route
-        let { pathArray, params } = route
+        let { pathArray, params, method } = route
 
         // Make a copy of the incoming path array
         let refIncomingPathArray = [...incomingPathArray];
@@ -35,7 +30,7 @@ const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method
         })
 
         // If the path arrays are the same, return the route
-        if (equals(pathArray, refIncomingPathArray)) return route    
+        if (equals(pathArray, refIncomingPathArray) && incomingMethod === method) return route    
     }
 
     return {}

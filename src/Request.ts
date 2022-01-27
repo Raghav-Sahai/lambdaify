@@ -1,6 +1,6 @@
 import { APIGatewayEventRequestContextV2 } from 'aws-lambda';
 import { StandardizedEvent } from './utils/standardizeEvent'
-import { RouteParams } from './types/Router.types'
+import { RouteParams } from './types/types'
 import { getPathArray } from './utils/parsePath'
 
 const Request = (
@@ -10,7 +10,7 @@ const Request = (
 
     // Extract params    
     const paramsObject = parseParams(event.path, params)
-    
+
     // Public request API
     const request = {
         version: event.payloadVersion,
@@ -30,6 +30,7 @@ const parseParams = (path: string, params: RouteParams): any => {
     
     let paramsObject: any = {}
     const pathArray = getPathArray(path)
+
     params.forEach((param) =>  paramsObject[param.key] = pathArray[param.index])
 
     return paramsObject

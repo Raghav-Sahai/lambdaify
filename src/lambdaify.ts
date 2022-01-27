@@ -1,10 +1,8 @@
-import {
-    APIGatewayEventRequestContextV2,
-} from 'aws-lambda';
+import { APIGatewayEventRequestContextV2 } from 'aws-lambda';
 import { Request } from './Request'
 import { Response } from './Response'
 import { router } from './Router'
-import { Route, RouteParams } from './types/Router.types'
+import { Route, RouteParams } from './types/types'
 import { standardizeEvent, StandardizedEvent } from './utils/standardizeEvent'
 
 const { log, error } = console
@@ -46,7 +44,7 @@ const lambdaify = (options: Object) => {
 
             try {
                 return await handleRun(standardEvent, context, callback, params)
-                
+
             } catch (err) {
                 // TODO: Need to have this return some kind of error response
                 error(err)

@@ -3,7 +3,8 @@ import {
     APIGatewayProxyEvent,
     ALBEvent,
 } from 'aws-lambda';
-import { Method } from '../types/Router.types'
+import { Method } from '../types/types'
+import { decodeBase64 } from '../utils/base64'
 
 interface StandardizedEvent {
     payloadVersion?: string,
@@ -47,7 +48,7 @@ const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
     const path = event.path
     const headers = event.headers
     const isBase64Encoded = event.isBase64Encoded
-    const body = event.body
+    const body = isBase64Encoded ? decodeBase64(event.body) : event.body
     const querystringParameters = event.queryStringParameters
 
     return {
@@ -67,7 +68,7 @@ const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedE
     const path = event.requestContext.http.path
     const headers = event.headers
     const isBase64Encoded = event.isBase64Encoded
-    const body = event.body
+    const body = isBase64Encoded ? decodeBase64(event.body) : event.body
     const querystringParameters = event.queryStringParameters
 
     return {
@@ -87,7 +88,7 @@ const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEve
     const path = event.path
     const headers = event.headers
     const isBase64Encoded = event.isBase64Encoded
-    const body = event.body
+    const body = isBase64Encoded ? decodeBase64(event.body) : event.body
     const querystringParameters = event.queryStringParameters
     
     return {
