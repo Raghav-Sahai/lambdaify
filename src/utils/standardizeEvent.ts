@@ -7,7 +7,7 @@ import { Method } from '../types/types'
 import { decodeBase64 } from '../utils/base64'
 
 interface StandardizedEvent {
-    payloadVersion?: string,
+    payloadVersion: string,
     method: Method
     path: string,
     headers?: Object,
@@ -43,7 +43,7 @@ const standardizeEvent = (event: any) => {
 }
 
 const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
-    const payloadVersion = undefined
+    const payloadVersion = 'alb'
     const method = event.httpMethod.toUpperCase() as Method
     const path = event.path
     const headers = event.headers
