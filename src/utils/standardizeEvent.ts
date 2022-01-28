@@ -3,11 +3,12 @@ import {
     APIGatewayProxyEvent,
     ALBEvent,
 } from 'aws-lambda';
-import { Method } from '../types/types'
+import { Method } from '../types/router.types'
 import { decodeBase64 } from '../utils/base64'
 
+type PayloadVersion = "alb" | "gatewayV1.0" | "gatewayV2.0"
 interface StandardizedEvent {
-    payloadVersion: string,
+    payloadVersion: PayloadVersion,
     method: Method
     path: string,
     headers?: Object,
@@ -63,7 +64,7 @@ const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
 }
 
 const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedEvent => {
-    const payloadVersion = event.version
+    const payloadVersion = "gatewayV2.0"
     const method = event.requestContext.http.method as Method
     const path = event.requestContext.http.path
     const headers = event.headers
@@ -83,7 +84,7 @@ const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedE
 }
 
 const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEvent => {
-    const payloadVersion = "1.0"
+    const payloadVersion = "gatewayV1.0"
     const method = event.httpMethod as Method
     const path = event.path
     const headers = event.headers

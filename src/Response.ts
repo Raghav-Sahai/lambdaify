@@ -1,12 +1,17 @@
 import {
     APIGatewayEventRequestContextV2,
-    APIGatewayProxyStructuredResultV2
+    APIGatewayProxyStructuredResultV2,
+    APIGatewayProxyResult,
+    APIGatewayProxyResultV2 ,
+    ALBResult
 } from 'aws-lambda';
 import { StandardizedEvent } from './utils/standardizeEvent'
 
 const Response = (event: StandardizedEvent, context: APIGatewayEventRequestContextV2): any => {
 
-    let isBase64Encoded: Boolean = false
+    let multiValueHeaders: any = {}
+    let cookies: Array<string> = []
+    let isBase64Encoded: boolean = false
     let statusCode: number = 200
     let headers: any = {}
     let body: any = ''
@@ -37,18 +42,45 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
         return createResponse()
     }
 
-    const createResponse = () => {
-        return {
-            isBase64Encoded,
-            statusCode,
-            headers,
-            body
+    const createResponse = (): any => {
+        const payloadVersion = event.payloadVersion
+
+        if (payloadVersion === "alb") {
+            const response: ALBResult = {
+                isBase64Encoded,
+                statusCode,
+                headers,
+                body,
+                statusDescription: getStatusDescription(statusCode)
+            }
+            return response
+        } else if (payloadVersion === "gatewayV1.0") {
+            const response: APIGatewayProxyResult = {
+                isBase64Encoded,
+                statusCode,
+                headers,
+                body,
+                multiValueHeaders
+            }
+            return response
+        } else if (payloadVersion ==="gatewayV2.0") {
+            const response: APIGatewayProxyResultV2 = {
+                isBase64Encoded,
+                statusCode,
+                headers,
+                body,
+                cookies
+            }
+            return response
         }
     }
 
     return response
 }
 
-
+const getStatusDescription = (statusCode: number): string | undefined => {
+    // TODO add logic for this
+    return ''
+}
 
 export { Response }

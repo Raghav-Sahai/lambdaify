@@ -1,7 +1,7 @@
 import {
     Param,
     RouteParams
-} from '../types/types'
+} from '../types/router.types'
 
 const parsePath = (rawPath: string): { params: RouteParams, pathArray: Array<string> } => {
 

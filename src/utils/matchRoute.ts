@@ -2,7 +2,7 @@ import {
     Router,
     Method, 
     Route 
-} from '../types/types'
+} from '../types/router.types'
 import { getPathArray } from './parsePath'
 
 const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method): Route | {} => {

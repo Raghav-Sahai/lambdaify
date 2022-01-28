@@ -2,7 +2,7 @@ import { APIGatewayEventRequestContextV2 } from 'aws-lambda';
 import { Request } from './Request'
 import { Response } from './Response'
 import { router } from './Router'
-import { Route, RouteParams } from './types/types'
+import { Route, RouteParams } from './types/router.types'
 import { standardizeEvent, StandardizedEvent } from './utils/standardizeEvent'
 
 const { log, error } = console

@@ -1,6 +1,6 @@
 import { APIGatewayEventRequestContextV2 } from 'aws-lambda';
 import { StandardizedEvent } from './utils/standardizeEvent'
-import { RouteParams } from './types/types'
+import { RouteParams } from './types/router.types'
 import { getPathArray } from './utils/parsePath'
 
 const Request = (
