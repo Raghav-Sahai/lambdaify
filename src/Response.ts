@@ -5,7 +5,8 @@ import {
     APIGatewayProxyResultV2 ,
     ALBResult
 } from 'aws-lambda';
-import { StandardizedEvent } from './utils/standardizeEvent'
+import { StandardizedEvent } from './utils/standardizeEvent';
+import { getStatusDescription } from './utils/statusCodes';
 
 const Response = (event: StandardizedEvent, context: APIGatewayEventRequestContextV2): any => {
 
@@ -76,11 +77,6 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
     }
 
     return response
-}
-
-const getStatusDescription = (statusCode: number): string | undefined => {
-    // TODO add logic for this
-    return ''
 }
 
 export { Response }
