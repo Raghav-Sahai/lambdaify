@@ -7,6 +7,7 @@ import {
 } from 'aws-lambda';
 import { StandardizedEvent } from './utils/standardizeEvent';
 import { getStatusDescription } from './utils/statusCodes';
+import { serialize  } from './utils/serializer'
 
 const Response = (event: StandardizedEvent, context: APIGatewayEventRequestContextV2): any => {
 
@@ -16,12 +17,14 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
     let statusCode: number = 200
     let headers: any = {}
     let body: any = ''
+    let serializer: any = ''
 
     // Public response API
     const response = {
         status: (code: number): any => setStatusCode(code),
         header: (key: string, value: string): any => setHeader(key, value),
         send: (body: any): object => setBody(body),
+        serializer: (serializer: Function): any => setSerializer(serializer)
     }
     
     // See: https://github.com/jeremydaly/lambda-api/blob/main/lib/response.js#L72
@@ -32,6 +35,8 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
         headers[_key] = _values
         return createResponse()
     }
+
+    const setSerializer = (serializerFunction: Function) => serializer = serializerFunction
 
     const setStatusCode = (code: number) => {
         statusCode = code
@@ -51,7 +56,7 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
                 isBase64Encoded,
                 statusCode,
                 headers,
-                body,
+                body: serialize(body, serializer),
                 statusDescription: getStatusDescription(statusCode)
             }
             return response
@@ -60,7 +65,7 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
                 isBase64Encoded,
                 statusCode,
                 headers,
-                body,
+                body: serialize(body, serializer),
                 multiValueHeaders
             }
             return response
@@ -69,7 +74,7 @@ const Response = (event: StandardizedEvent, context: APIGatewayEventRequestConte
                 isBase64Encoded,
                 statusCode,
                 headers,
-                body,
+                body: serialize(body, serializer),
                 cookies
             }
             return response

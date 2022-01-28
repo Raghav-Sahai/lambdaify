@@ -7,7 +7,7 @@ import { getPathArray } from './parsePath'
 
 const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method): Route | {} => {
     
-    // If no matches, return throw error
+    // If no router, return
     if (!router) return {}
 
     // Get path arry for the incoming path
