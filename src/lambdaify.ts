@@ -82,7 +82,7 @@ const handleRun = async (
     log('lambdaify::handleRun()')
 
     // Create request and response references
-    const request = Request(event, context, params)
+    const request = new Request(event, context, params)
     const response = Response(event, context)
 
     try {
