@@ -9,6 +9,11 @@ import {
 } from './utils/standardize';
 import { getStatusDescription } from './utils/statusCodes';
 
+const RESPONSE_ALREADY_SENT = new Error("Response was already sent")
+const CODE_ERROR = new Error("Invalid status code")
+const SERIALIZER_MUST_BE_FUNCTION = new Error("Serializer must be of type function")
+const COOKIE_MUST_BE_STRING = new Error("Cookie must be of type string")
+
 function Response (_event: StandardizedEvent, context: StandardizedContext) {
     this.event = _event
     this.context = context
@@ -26,7 +31,7 @@ function Response (_event: StandardizedEvent, context: StandardizedContext) {
             const response: ALBResult = {
                 isBase64Encoded: this.isBase64Encoded,
                 statusCode: this.statusCode,
-                headers: this.headers,
+                headers: { ...this.multiValueHeaders, ...this.headers },
                 body: serialize(this.body, this.serializer),
                 statusDescription: getStatusDescription(this.statusCode)
             }
@@ -44,7 +49,7 @@ function Response (_event: StandardizedEvent, context: StandardizedContext) {
             const response: APIGatewayProxyResultV2 = {
                 isBase64Encoded: this.isBase64Encoded,
                 statusCode: this.statusCode,
-                headers: this.headers,
+                headers: { ...this.multiValueHeaders, ...this.headers } ,
                 body: serialize(this.body, this.serializer),
                 cookies: this.cookies
             }
@@ -55,7 +60,7 @@ function Response (_event: StandardizedEvent, context: StandardizedContext) {
 
 // send
 Response.prototype.send = function (body: any) {
-    if (this.isResponseSent) throw new Error("Response was already sent")
+    if (this.isResponseSent) throw RESPONSE_ALREADY_SENT
     this.body = body
 
     this.isResponseSent = true
@@ -64,6 +69,8 @@ Response.prototype.send = function (body: any) {
 
 // set cookie
 Response.prototype.cookie = function (cookie: string) {
+
+    if (typeof cookie !== 'string') throw COOKIE_MUST_BE_STRING
     this.cookies.push(cookie)
 
     return this
@@ -85,7 +92,9 @@ Response.prototype.header = function (key: string, value: Array<string> | string
 }
 
 // sets serializer
-Response.prototype.serializer = function (fn) {
+Response.prototype.serializer = function (fn: Function) {
+
+    if (typeof fn !== 'function') throw SERIALIZER_MUST_BE_FUNCTION
     this.serializer = fn
 
     return this
@@ -95,7 +104,7 @@ Response.prototype.serializer = function (fn) {
 Response.prototype.code = function (code) {
     const intValue = parseInt(code)
     if (isNaN(intValue) || intValue < 100 || intValue > 600) {
-        throw new Error("code must be an integer");
+        throw CODE_ERROR;
     }
     this.statusCode = intValue
 

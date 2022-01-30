@@ -14,8 +14,8 @@ import { router } from './Router'
 
 const { log, error } = console
 
-const routeNotFound = new Error('This route does not exist')
-const unexpectedError = new Error('Unexpected error')
+const ROUTE_NOT_FOUND = new Error('This route does not exist')
+const UNEXPECTED_ERROR = new Error('Unexpected error')
 
 const lambdaify = (options: Object) => {
 
@@ -45,7 +45,7 @@ const lambdaify = (options: Object) => {
             const matchedRoute: Route = Router.matchedRoute(method, path)
 
             // TODO: Need to have this return 404 response
-            if (!matchedRoute) throw routeNotFound
+            if (!matchedRoute) throw ROUTE_NOT_FOUND
 
             // Extract route callback and params object
             const { callback, params } = matchedRoute
@@ -56,7 +56,7 @@ const lambdaify = (options: Object) => {
             } catch (err) {
                 // TODO: Need to have this return some kind of error response
                 error(err)
-                throw unexpectedError
+                throw UNEXPECTED_ERROR
             }
         },
         get: ( path: string, callback: Function):any => {
@@ -98,11 +98,20 @@ const handleRun = async (
         return response.createResponse()
     } catch (err) {
 
-        // TODO: Need to have this return some kind of error response
         error(err)
-        throw err
+        return formatError(err)
     }
-
+}
+const formatError = (error: Error) => {
+    return {
+        "statusCode": 400,
+        "headers": {
+          "Content-Type": "text/plain",
+          "x-amzn-ErrorType": 400
+        },
+        "isBase64Encoded": false,
+        "body": error.message
+      }
 }
 
 module.exports = lambdaify
