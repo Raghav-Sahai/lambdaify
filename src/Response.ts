@@ -1,87 +1,102 @@
 import {
     APIGatewayEventRequestContextV2,
-    APIGatewayProxyStructuredResultV2,
     APIGatewayProxyResult,
     APIGatewayProxyResultV2 ,
     ALBResult
 } from 'aws-lambda';
 import { StandardizedEvent } from './utils/standardizeEvent';
 import { getStatusDescription } from './utils/statusCodes';
-import { serialize  } from './utils/serializer'
+import { serialize } from './utils/serializer'
 
-const Response = (event: StandardizedEvent, context: APIGatewayEventRequestContextV2): any => {
-
-    let multiValueHeaders: any = {}
-    let cookies: Array<string> = []
-    let isBase64Encoded: boolean = false
-    let statusCode: number = 200
-    let headers: any = {}
-    let body: any = ''
-    let serializer: any = ''
-
-    // Public response API
-    const response = {
-        status: (code: number): any => setStatusCode(code),
-        header: (key: string, value: string): any => setHeader(key, value),
-        send: (body: any): object => setBody(body),
-        serializer: (serializer: Function): any => setSerializer(serializer)
-    }
-    
-    // See: https://github.com/jeremydaly/lambda-api/blob/main/lib/response.js#L72
-    const setHeader = (key: string, value: string) => {
-        let _key = key.toLowerCase(); // store as lowercase
-        let _values = value ? (Array.isArray(value) ? value : [value]) : [''];
-    
-        headers[_key] = _values
-        return createResponse()
-    }
-
-    const setSerializer = (serializerFunction: Function) => serializer = serializerFunction
-
-    const setStatusCode = (code: number) => {
-        statusCode = code
-        return createResponse()
-    }
-
-    const setBody = (_body: any) => {
-        body = JSON.stringify(_body)
-        return createResponse()
-    }
-
-    const createResponse = (): any => {
-        const payloadVersion = event.payloadVersion
-
+function Response (_event: StandardizedEvent, context: APIGatewayEventRequestContextV2) {
+    this.event = _event
+    this.context = context
+    this.responseSent = false
+    this.multiValueHeaders = {} //done
+    this.cookies = [] // done
+    this.isBase64Encoded = false
+    this.statusCode = 200 // done
+    this.headers = {} // done
+    this.body = null
+    this.serializer = null // done
+    this.createResponse = (): any => {
+        const payloadVersion = this.event.payloadVersion
         if (payloadVersion === "alb") {
             const response: ALBResult = {
-                isBase64Encoded,
-                statusCode,
-                headers,
-                body: serialize(body, serializer),
-                statusDescription: getStatusDescription(statusCode)
+                isBase64Encoded: this.isBase64Encoded,
+                statusCode: this.statusCode,
+                headers: this.headers,
+                body: serialize(this.body, this.serializer),
+                statusDescription: getStatusDescription(this.statusCode)
             }
             return response
         } else if (payloadVersion === "gatewayV1.0") {
             const response: APIGatewayProxyResult = {
-                isBase64Encoded,
-                statusCode,
-                headers,
-                body: serialize(body, serializer),
-                multiValueHeaders
+                isBase64Encoded: this.isBase64Encoded,
+                statusCode:  this.statusCode,
+                headers: this.headers,
+                body: serialize(this.body, this.serializer),
+                multiValueHeaders: this.multiValueHeaders
             }
             return response
         } else if (payloadVersion ==="gatewayV2.0") {
             const response: APIGatewayProxyResultV2 = {
-                isBase64Encoded,
-                statusCode,
-                headers,
-                body: serialize(body, serializer),
-                cookies
+                isBase64Encoded: this.isBase64Encoded,
+                statusCode: this.statusCode,
+                headers: this.headers,
+                body: serialize(this.body, this.serializer),
+                cookies: this.cookies
             }
             return response
         }
     }
-
-    return response
 }
+
+// send
+Response.prototype.send = function (body: any) {
+    this.body = body
+    this.responseSent = true
+    return this.createResponse()
+}
+
+// set cookie
+Response.prototype.cookie = function (cookie: string) {
+    this.cookies.push(cookie)
+
+    return this
+}
+
+// sets header
+Response.prototype.header = function (key: string, value: Array<string> | string) {
+    const _key = key.toLowerCase()
+
+    value = value === undefined ? '' : value
+
+    if (Array.isArray(value)) { 
+        this.multiValueHeaders[_key] = value 
+    } else if (typeof value === "string") {
+        this.headers[_key] = value
+    }
+    
+    return this
+}
+
+// sets serializer
+Response.prototype.serializer = function (fn) {
+    this.serializer = fn
+    return this
+}
+
+// sets status codes
+Response.prototype.code = function (code) {
+    const intValue = parseInt(code)
+    if (isNaN(intValue) || intValue < 100 || intValue > 600) {
+        throw new Error("code must be an integer");
+    }
+    this.statusCode = intValue
+
+    return this
+}
+Response.prototype.status = Response.prototype.code
 
 export { Response }

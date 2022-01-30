@@ -83,7 +83,7 @@ const handleRun = async (
 
     // Create request and response references
     const request = new Request(event, context, params)
-    const response = Response(event, context)
+    const response = new Response(event, context)
 
     try {
         return await callback(request, response)

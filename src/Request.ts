@@ -11,59 +11,61 @@ function Request (event: StandardizedEvent, context: APIGatewayEventRequestConte
 
 Object.defineProperties(Request.prototype, {
     req: {
-        get() {
+        get(): StandardizedEvent {
             return this.event
         }
     },
     version: {
-        get() {
+        get(): string {
             return this.event.payloadVersion
         }
     },
     body: {
-        get() {
+        get(): any {
             return this.event.body
         }
     },
     headers: {
-        get() {
+        get(): any {
             return this.event.headers
         }
     },
     path: {
-        get() {
+        get(): string {
             return this.event.path
         }
     },
     method: {
-        get() {
+        get(): string {
             return this.event.method
         }
     },
     isBase64Encoded: {
-        get() {
+        get(): boolean {
             return this.event.isBase64Encoded
         }
     },
     querystringParameters: {
-        get() {
+        get(): any {
             return this.event.querystringParameters
         }
     },
     params: {
-        get() {
+        get(): object {
             return parseParams(this.event.path, this.paramsMap)
         }
     }
 })
 
-const parseParams = (path: string, params: RouteParams): any => {
+const parseParams = (path: string, params: RouteParams): object => {
+
+    // If no params, return empty object
     if (!params) return {}
     
     let _params: any = {}
     const pathArray = getPathArray(path)
 
-    params.forEach((param) =>  _params[param.key] = pathArray[param.index])
+    params.forEach(param =>  _params[param.key] = pathArray[param.index])
 
     return _params
 }
