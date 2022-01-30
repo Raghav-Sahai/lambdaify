@@ -1,4 +1,7 @@
-import { StandardizedEvent, StandardizedContext } from './utils/standardize';
+import {
+    StandardizedEvent,
+    StandardizedContext
+} from './utils/standardize';
 import { RouteParams } from './types/router.types';
 import { getPathArray } from './utils/parsePath';
 

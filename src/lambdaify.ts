@@ -1,14 +1,16 @@
-import { APIGatewayEventRequestContextV2 } from 'aws-lambda';
-import { Request } from './Request'
-import { Response } from './Response'
-import { router } from './Router'
-import { Route, RouteParams } from './types/router.types'
+import {
+    Route,
+    RouteParams
+} from './types/router.types'
 import {
     standardizeEvent,
     StandardizedEvent,
     standardizeContext,
     StandardizedContext
 } from './utils/standardize'
+import { Request } from './Request'
+import { Response } from './Response'
+import { router } from './Router'
 
 const { log, error } = console
 
@@ -23,7 +25,7 @@ const lambdaify = (options: Object) => {
     }
 
     // Initialize router
-    const Router = router()
+    const Router = router({})
 
     //Public API
     const lambdaify = {

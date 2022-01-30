@@ -1,12 +1,13 @@
 import {
-    APIGatewayEventRequestContextV2,
     APIGatewayProxyResult,
     APIGatewayProxyResultV2 ,
     ALBResult
 } from 'aws-lambda';
-import { StandardizedEvent, StandardizedContext } from './utils/standardize';
+import {
+    StandardizedEvent,
+    StandardizedContext
+} from './utils/standardize';
 import { getStatusDescription } from './utils/statusCodes';
-import { serialize } from './utils/serializer'
 
 function Response (_event: StandardizedEvent, context: StandardizedContext) {
     this.event = _event
@@ -101,5 +102,15 @@ Response.prototype.code = function (code) {
     return this
 }
 Response.prototype.status = Response.prototype.code
+
+const serialize = (body: any, serializer: any): any => {
+    const encoding = typeof serializer === 'function' ? serializer : JSON.stringify;
+    if (typeof body === "object") {
+        return encoding(body)
+    } else if (typeof body !== "string") {
+        return body.toString()
+    }
+    return body
+}
 
 export { Response }
