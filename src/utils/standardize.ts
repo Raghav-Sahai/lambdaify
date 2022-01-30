@@ -4,11 +4,12 @@ import {
     ALBEvent,
 } from 'aws-lambda';
 import { Method } from '../types/router.types'
-import { decodeBase64 } from '../utils/base64'
+import { decodeBase64 } from './base64'
 
 type PayloadVersion = "alb" | "gatewayV1.0" | "gatewayV2.0"
 interface StandardizedEvent {
     payloadVersion: PayloadVersion,
+    raw: any
     method: Method
     path: string,
     headers?: Object,
@@ -16,8 +17,13 @@ interface StandardizedEvent {
     body?: any
     querystringParameters?: Object | null
 }
+interface StandardizedContext {}
 
 const unrecognizedEventTypeError = new Error("Unrecognized event type")
+
+const standardizeContext = (context: any): StandardizedContext => {
+    return context
+}
 
 const standardizeEvent = (event: any) => {
 
@@ -45,6 +51,7 @@ const standardizeEvent = (event: any) => {
 
 const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
     const payloadVersion = 'alb'
+    const raw = event
     const method = event.httpMethod.toUpperCase() as Method
     const path = event.path
     const headers = event.headers
@@ -54,6 +61,7 @@ const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
 
     return {
         payloadVersion,
+        raw,
         method,
         path,
         headers,
@@ -65,6 +73,7 @@ const standardizeAlbEvent = (event: ALBEvent): StandardizedEvent => {
 
 const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedEvent => {
     const payloadVersion = "gatewayV2.0"
+    const raw = event
     const method = event.requestContext.http.method as Method
     const path = event.requestContext.http.path
     const headers = event.headers
@@ -74,6 +83,7 @@ const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedE
 
     return {
         payloadVersion,
+        raw,
         method,
         path,
         headers,
@@ -85,6 +95,7 @@ const standardizeGatewayV2Event = (event: APIGatewayProxyEventV2): StandardizedE
 
 const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEvent => {
     const payloadVersion = "gatewayV1.0"
+    const raw = event
     const method = event.httpMethod as Method
     const path = event.path
     const headers = event.headers
@@ -94,6 +105,7 @@ const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEve
     
     return {
         payloadVersion,
+        raw,
         method,
         path,
         headers,
@@ -103,4 +115,9 @@ const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEve
     }
 }
 
-export { standardizeEvent, StandardizedEvent }
+export { 
+    standardizeEvent, 
+    StandardizedEvent,
+    standardizeContext,
+    StandardizedContext
+}

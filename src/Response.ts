@@ -4,11 +4,11 @@ import {
     APIGatewayProxyResultV2 ,
     ALBResult
 } from 'aws-lambda';
-import { StandardizedEvent } from './utils/standardizeEvent';
+import { StandardizedEvent, StandardizedContext } from './utils/standardize';
 import { getStatusDescription } from './utils/statusCodes';
 import { serialize } from './utils/serializer'
 
-function Response (_event: StandardizedEvent, context: APIGatewayEventRequestContextV2) {
+function Response (_event: StandardizedEvent, context: StandardizedContext) {
     this.event = _event
     this.context = context
     this.isResponseSent = false

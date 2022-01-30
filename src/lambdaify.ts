@@ -3,7 +3,12 @@ import { Request } from './Request'
 import { Response } from './Response'
 import { router } from './Router'
 import { Route, RouteParams } from './types/router.types'
-import { standardizeEvent, StandardizedEvent } from './utils/standardizeEvent'
+import {
+    standardizeEvent,
+    StandardizedEvent,
+    standardizeContext,
+    StandardizedContext
+} from './utils/standardize'
 
 const { log, error } = console
 
@@ -29,6 +34,7 @@ const lambdaify = (options: Object) => {
 
             // Standardize event
             const standardEvent: StandardizedEvent = standardizeEvent(event)
+            const standardContext: StandardizedContext = standardizeContext(context)
 
             // Extract method and path from event
             const { method, path } = standardEvent
@@ -43,7 +49,7 @@ const lambdaify = (options: Object) => {
             const { callback, params } = matchedRoute
 
             try {
-                return await handleRun(standardEvent, context, callback, params)
+                return await handleRun(standardEvent, standardContext, callback, params)
 
             } catch (err) {
                 // TODO: Need to have this return some kind of error response
@@ -75,7 +81,7 @@ const lambdaify = (options: Object) => {
 
 const handleRun = async (
     event: StandardizedEvent,
-    context: APIGatewayEventRequestContextV2,
+    context: StandardizedContext,
     callback: Function,
     params: RouteParams
     ): Promise<any> => {
