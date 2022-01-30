@@ -86,8 +86,8 @@ const handleRun = async (
     const response = new Response(event, context)
 
     try {
-        return await callback(request, response)
-
+        await callback(request, response)
+        return response.createResponse()
     } catch (err) {
 
         // TODO: Need to have this return some kind of error response

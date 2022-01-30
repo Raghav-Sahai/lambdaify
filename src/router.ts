@@ -23,13 +23,7 @@ const router = (): any => {
             router.push(route)
             return router
         },
-        matchedRoute: (method: Method, path: string): Route | {} => {
-            const incomingPath = path
-            const incomingMethod = method
-            const matchedRoute = matchRoute(router, incomingPath, incomingMethod as Method)
-
-            return matchedRoute
-        },
+        matchedRoute: (method: Method, path: string): Route | {} => matchRoute(router, path, method as Method),
         getRouter: () => console.log(JSON.stringify(router)) // Here for test purposes
     }
 }

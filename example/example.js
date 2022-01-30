@@ -25,12 +25,11 @@ const context = {}
 
 lambdaify.get('/get/:id', (req, res) => {
     console.log('example::get')
-    console.log('req', req)
     console.log('req.body', req.body)
     console.log('req.headers', req.headers)
     console.log('req.params', req.params)
     res.header('headerKey', 'headerValue')
-    return res.send('test body')
+    return res.send('test body').code(220)
 })
 // lambdaify.router()
 const run = async () => {

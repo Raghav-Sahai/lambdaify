@@ -11,14 +11,14 @@ import { serialize } from './utils/serializer'
 function Response (_event: StandardizedEvent, context: APIGatewayEventRequestContextV2) {
     this.event = _event
     this.context = context
-    this.responseSent = false
-    this.multiValueHeaders = {} //done
-    this.cookies = [] // done
+    this.isResponseSent = false
+    this.multiValueHeaders = {}
+    this.cookies = []
     this.isBase64Encoded = false
-    this.statusCode = 200 // done
-    this.headers = {} // done
+    this.statusCode = 200
+    this.headers = {}
     this.body = null
-    this.serializer = null // done
+    this.serializer = null
     this.createResponse = (): any => {
         const payloadVersion = this.event.payloadVersion
         if (payloadVersion === "alb") {
@@ -54,9 +54,11 @@ function Response (_event: StandardizedEvent, context: APIGatewayEventRequestCon
 
 // send
 Response.prototype.send = function (body: any) {
+    if (this.isResponseSent) throw new Error("Response was already sent")
     this.body = body
-    this.responseSent = true
-    return this.createResponse()
+
+    this.isResponseSent = true
+    return this
 }
 
 // set cookie
@@ -84,6 +86,7 @@ Response.prototype.header = function (key: string, value: Array<string> | string
 // sets serializer
 Response.prototype.serializer = function (fn) {
     this.serializer = fn
+
     return this
 }
 

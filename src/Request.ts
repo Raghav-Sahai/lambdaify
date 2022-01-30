@@ -1,12 +1,12 @@
 import { APIGatewayEventRequestContextV2 } from 'aws-lambda';
-import { StandardizedEvent } from './utils/standardizeEvent'
-import { RouteParams } from './types/router.types'
-import { getPathArray } from './utils/parsePath'
+import { StandardizedEvent } from './utils/standardizeEvent';
+import { RouteParams } from './types/router.types';
+import { getPathArray } from './utils/parsePath';
 
 function Request (event: StandardizedEvent, context: APIGatewayEventRequestContextV2, paramsMap: RouteParams) {
-    this.event = event,
-    this.context = context,
-    this.paramsMap = paramsMap
+    this.event = event;
+    this.context = context;
+    this.paramsMap = paramsMap;
 }
 
 Object.defineProperties(Request.prototype, {
