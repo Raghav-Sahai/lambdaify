@@ -18,7 +18,9 @@
   "keywords": [
     "lambda",
     "api",
-    "aws"
+    "aws",
+    "serverless",
+    "serverless api"
   ],
   "author": "Raghav Sahai",
   "license": "ISC",
