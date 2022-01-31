@@ -1,13 +1,13 @@
 {
   "name": "lambdaify",
   "version": "1.0.0",
-  "description": "Lambda api",
+  "description": "Create aws lambda apis easily",
   "main": "lib/lambdaify.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
-    "test": "jest --config jestconfig.json",
+    "test": "jest --config jestconfig.json --coverage",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",

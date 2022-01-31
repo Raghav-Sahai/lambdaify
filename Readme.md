@@ -10,10 +10,12 @@ Create lambda apis easily
 const lambdaify = require('lambdaify')()
 
 lambdaify.get('/get/:id', (req, res) => {
-    return res.send('lambdaify!').code(201)
+    return res
+            .code(200)
+            .send('hello from lambdaify!')
 })
 
-const handler = async (event, context) => {
-    return await lambdaify.run(event, context);
+const handler = (event, context) => {
+    return lambdaify.run(event, context);
 };
 ```

@@ -5,6 +5,7 @@
     "declaration": true,
     "outDir": "./lib",
     "noImplicitAny": false,
+    "allowJs": true
   },
   "include": ["src", "__tests__"],
   "exclude": ["node_modules", "**/__tests__/*"]
