@@ -29,36 +29,34 @@ const router = (options: object): any => {
             return router
         },
         matchedRoute: (method: Method, path: string): Route | {} => matchRoute(router, path, method as Method),
-        getRouter: () => console.log(JSON.stringify(router)) // Here for test purposes
+        getRouter: (): Router => router
     }
 }
 
 const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method): Route | {} => {
     
-    // If no router, return
-    if (!router) return {}
-
     // Get path arry for the incoming path
     const incomingPathArray = getPathArray(incomingPath)
 
-    for (let route of router) {
+    for (const route of router) {
 
         // Extract pathArray and params from route
-        let { pathArray, params, method } = route
+        const { pathArray, params, method } = route
 
-        // Make a copy of the incoming path array
-        let refIncomingPathArray = [...incomingPathArray];
+        // Make a copy of the path arrays
+        const refRoutePathArray = [...pathArray]
+        const refIncomingPathArray = [...incomingPathArray];
 
         (params).forEach(param => {
 
             // Replace the param index with filler variable
-            pathArray[param.index] = '__var__'
+            refRoutePathArray[param.index] = '__var__'
             refIncomingPathArray[param.index] = '__var__'
 
         })
 
         // If the path arrays are the same, return the route
-        if (equals(pathArray, refIncomingPathArray) && incomingMethod === method) return route    
+        if (equals(refRoutePathArray, refIncomingPathArray) && incomingMethod === method) return route    
     }
 
     return {}
@@ -67,3 +65,8 @@ const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method
 const equals = (array1: Array<string>, array2: Array<string>): boolean => JSON.stringify(array1) === JSON.stringify(array2);
 
 export { router }
+
+// For tests
+module.exports = router
+module.exports.router = router
+module.exports.default = router

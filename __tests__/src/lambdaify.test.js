@@ -1,11 +1,8 @@
 const lambdaify = require('../../src/lambdaify')
+const router = require('../../src/Router')
 
 describe("lambdaify()", () => {
-    let app;
-
-    beforeEach(() => {
-        app = lambdaify()
-    });
+    const app = lambdaify();
     describe("When lambdaify is initialized", () => {
         describe("run()", () => {
             it("Then the run function exists", () => {
@@ -18,17 +15,17 @@ describe("lambdaify()", () => {
             })
         })
         describe("put()", () => {
-            it("Then the get function exists", () => {
+            it("Then the put function exists", () => {
                 expect(typeof app.put).toBe('function');
             })
         })
         describe("post()", () => {
-            it("Then the get function exists", () => {
+            it("Then the post function exists", () => {
                 expect(typeof app.put).toBe('function');
             })
         })
         describe("delete()", () => {
-            it("Then the get function exists", () => {
+            it("Then the delete function exists", () => {
                 expect(typeof app.put).toBe('function');
             })
         })

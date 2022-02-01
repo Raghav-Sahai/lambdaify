@@ -59,22 +59,10 @@ const lambdaify = (options: Object) => {
                 throw UNEXPECTED_ERROR
             }
         },
-        get: ( path: string, callback: Function):any => {
-            log('lambdaify::get()')
-            Router.registerRoute('GET', path, callback)
-        },
-        put: (path: string, callback: Function):any => {
-            log('lambdaify::put()')
-            Router.registerRoute('PUT', path, callback)
-        },
-        post: (path: string, callback: Function):any => {
-            log('lambdaify::post()')
-            Router.registerRoute('POST', path, callback)
-        },
-        delete: (path: string, callback: Function):any => {
-            log('lambdaify::delete()')
-            Router.registerRoute('DELETE', path, callback)
-        },
+        get: (path: string, callback: Function):any => Router.registerRoute('GET', path, callback),
+        put: (path: string, callback: Function):any => Router.registerRoute('PUT', path, callback),
+        post: (path: string, callback: Function):any => Router.registerRoute('POST', path, callback),
+        delete: (path: string, callback: Function):any => Router.registerRoute('DELETE', path, callback),
         router: () => Router.getRouter() // For test purposes
     }    
 
