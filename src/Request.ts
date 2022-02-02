@@ -67,7 +67,7 @@ Object.defineProperties(Request.prototype, {
 const parseParams = (path: string, params: RouteParams): object => {
 
     // If no params, return empty object
-    if (!params) return {}
+    if (params.length === 0) return {}
     
     let _params: any = {}
     const pathArray = getPathArray(path)
@@ -78,3 +78,5 @@ const parseParams = (path: string, params: RouteParams): object => {
 }
 
 export { Request }
+
+module.exports = Request

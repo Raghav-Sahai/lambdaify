@@ -56,7 +56,7 @@ describe("Standardize", () => {
             it("Then a standardized event is returned", () => {
                 const standardEvent = standardizeEvent(albEvent)
                 const expected = {
-                    "body": "",
+                    "body": "Hello from alb!",
                     "headers": {
                       "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
                       "accept-encoding": "gzip",

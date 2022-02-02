@@ -23,6 +23,6 @@
         "x-forwarded-proto": "http",
         "x-imforwards": "20"
     },
-    "body": "",
+    "body": "Hello from alb!",
     "isBase64Encoded": false
 }
