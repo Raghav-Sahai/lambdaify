@@ -121,3 +121,5 @@ export {
     standardizeContext,
     StandardizedContext
 }
+
+module.exports = { standardizeEvent, standardizeContext }

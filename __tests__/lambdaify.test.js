@@ -1,5 +1,5 @@
-const lambdaify = require('../../src/lambdaify')
-const router = require('../../src/Router')
+const lambdaify = require('../src/lambdaify')
+const router = require('../src/Router')
 
 describe("lambdaify()", () => {
     const app = lambdaify();

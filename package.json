@@ -23,7 +23,7 @@
     "serverless api"
   ],
   "author": "Raghav Sahai",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.89",
     "@types/jest": "^27.4.0",

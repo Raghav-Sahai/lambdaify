@@ -1,4 +1,4 @@
-const router = require('../../src/Router')
+const router = require('../src/Router')
 
 describe("Router()", () => {
     let Router;
