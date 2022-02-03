@@ -9,7 +9,7 @@ const standardizeContext = standardize.standardizeContext
 const standardContext = standardizeContext({})
 const standardEvent = standardizeEvent(albEvent)
 
-describe('Request', () => {
+describe('Request()', () => {
   describe('When a request is created', () => {
     describe('When there are no params to be passed in', () => {
       const paramsMap = []
