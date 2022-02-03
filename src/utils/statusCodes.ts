@@ -60,3 +60,5 @@ const statusCodes: any = {
 const getStatusDescription = (code: number): string => code in statusCodes ? statusCodes[code] : "Unknown";
 
 export { getStatusDescription }
+
+module.exports = getStatusDescription

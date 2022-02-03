@@ -123,3 +123,5 @@ const serialize = (body: any, serializer: any): any => {
 }
 
 export { Response }
+
+module.exports = Response

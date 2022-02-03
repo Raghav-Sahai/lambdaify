@@ -5,3 +5,5 @@ export {
     decodeBase64,
     encodeBase64
 }
+
+module.exports = { decodeBase64, encodeBase64 }
