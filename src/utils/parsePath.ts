@@ -1,10 +1,8 @@
-import {
-    Param,
-    RouteParams
-} from '../types/router.types'
+import { Param, RouteParams } from '../types/router.types'
 
-const parsePath = (rawPath: string): { params: RouteParams, pathArray: Array<string> } => {
-
+const parsePath = (
+    rawPath: string
+): { params: RouteParams; pathArray: Array<string> } => {
     // Extract path information
     const pathArray = getPathArray(rawPath)
     const params = getParams(pathArray)
@@ -14,11 +12,11 @@ const parsePath = (rawPath: string): { params: RouteParams, pathArray: Array<str
 const getPathArray = (rawPath: string): Array<string> => {
     return rawPath
         ? rawPath
-            .trim()
-            .split('?')[0]
-            .replace(/^\/(.*?)(\/)*$/, '$1') // IDK about this
-            .split('/')
-        : [];
+              .trim()
+              .split('?')[0]
+              .replace(/^\/(.*?)(\/)*$/, '$1') // IDK about this
+              .split('/')
+        : []
 }
 const getParams = (pathArray: Array<string>): RouteParams => {
     let params: RouteParams = []
@@ -27,12 +25,12 @@ const getParams = (pathArray: Array<string>): RouteParams => {
         if (/^:(.*)$/.test(fragment)) {
             const param: Param = {
                 key: fragment.substr(1),
-                index
+                index,
             }
             params.push(param)
         }
     })
-    
+
     return params
 }
 

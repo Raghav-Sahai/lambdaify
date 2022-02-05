@@ -5,14 +5,14 @@ const event = {
     path: '/get/1234',
     body: 'event body',
     headers: {
-        'header': 'testHeader'
+        header: 'testHeader',
     },
     queryStringParameters: '',
     requestContext: {
         elb: {
-            targetGroupArn: 'test'
-        }
-    }
+            targetGroupArn: 'test',
+        },
+    },
 }
 const context = {}
 // lambdaify.get('/', (req, res) => {

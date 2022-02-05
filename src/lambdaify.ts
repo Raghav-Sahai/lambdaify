@@ -1,12 +1,9 @@
-import {
-    Route,
-    RouteParams
-} from './types/router.types'
+import { Route, RouteParams } from './types/router.types'
 import {
     standardizeEvent,
     StandardizedEvent,
     standardizeContext,
-    StandardizedContext
+    StandardizedContext,
 } from './utils/standardize'
 import { Request } from './Request'
 import { Response } from './Response'
@@ -18,7 +15,6 @@ const ROUTE_NOT_FOUND = new Error('This route does not exist')
 const UNEXPECTED_ERROR = new Error('Unexpected error')
 
 const lambdaify = (options: Object) => {
-
     options = options || {}
     if (typeof options !== 'object') {
         throw new Error('Options must be an object')
@@ -29,14 +25,14 @@ const lambdaify = (options: Object) => {
 
     //Public API
     const lambdaify = {
-
         // TODO: Have this be either APIGateway v1, v2, or alb
-        run: async (event: any, context: any):Promise<any> => {
+        run: async (event: any, context: any): Promise<any> => {
             log('lambdaify::run()')
 
             // Standardize event
             const standardEvent: StandardizedEvent = standardizeEvent(event)
-            const standardContext: StandardizedContext = standardizeContext(context)
+            const standardContext: StandardizedContext =
+                standardizeContext(context)
 
             // Extract method and path from event
             const { method, path } = standardEvent
@@ -51,20 +47,28 @@ const lambdaify = (options: Object) => {
             const { callback, params } = matchedRoute
 
             try {
-                return await handleRun(standardEvent, standardContext, callback, params)
-
+                return await handleRun(
+                    standardEvent,
+                    standardContext,
+                    callback,
+                    params
+                )
             } catch (err) {
                 // TODO: Need to have this return some kind of error response
                 error(err)
                 throw UNEXPECTED_ERROR
             }
         },
-        get: (path: string, callback: Function):any => Router.registerRoute('GET', path, callback),
-        put: (path: string, callback: Function):any => Router.registerRoute('PUT', path, callback),
-        post: (path: string, callback: Function):any => Router.registerRoute('POST', path, callback),
-        delete: (path: string, callback: Function):any => Router.registerRoute('DELETE', path, callback),
-        router: () => Router.getRouter() // For test purposes
-    }    
+        get: (path: string, callback: Function): any =>
+            Router.registerRoute('GET', path, callback),
+        put: (path: string, callback: Function): any =>
+            Router.registerRoute('PUT', path, callback),
+        post: (path: string, callback: Function): any =>
+            Router.registerRoute('POST', path, callback),
+        delete: (path: string, callback: Function): any =>
+            Router.registerRoute('DELETE', path, callback),
+        router: () => Router.getRouter(), // For test purposes
+    }
 
     return lambdaify
 }
@@ -74,7 +78,7 @@ const handleRun = async (
     context: StandardizedContext,
     callback: Function,
     params: RouteParams
-    ): Promise<any> => {
+): Promise<any> => {
     log('lambdaify::handleRun()')
 
     // Create request and response references
@@ -85,21 +89,20 @@ const handleRun = async (
         await callback(request, response)
         return response.createResponse()
     } catch (err) {
-
         error(err)
         return formatError(err)
     }
 }
 const formatError = (error: Error) => {
     return {
-        "statusCode": 400,
-        "headers": {
-          "Content-Type": "text/plain",
-          "x-amzn-ErrorType": 400
+        statusCode: 400,
+        headers: {
+            'Content-Type': 'text/plain',
+            'x-amzn-ErrorType': 400,
         },
-        "isBase64Encoded": false,
-        "body": error.message
-      }
+        isBase64Encoded: false,
+        body: error.message,
+    }
 }
 
 module.exports = lambdaify

@@ -1,4 +1,4 @@
-const statusCodes: any = { 
+const statusCodes: any = {
     '100': 'Continue',
     '101': 'Switching Protocols',
     '102': 'Processing',
@@ -35,7 +35,7 @@ const statusCodes: any = {
     '415': 'Unsupported Media Type',
     '416': 'Requested Range Not Satisfiable',
     '417': 'Expectation Failed',
-    '418': 'I\'m a teapot',
+    '418': "I'm a teapot",
     '422': 'Unprocessable Entity',
     '423': 'Locked',
     '424': 'Failed Dependency',
@@ -54,10 +54,11 @@ const statusCodes: any = {
     '507': 'Insufficient Storage',
     '509': 'Bandwidth Limit Exceeded',
     '510': 'Not Extended',
-    '511': 'Network Authentication Required' 
+    '511': 'Network Authentication Required',
 }
 
-const getStatusDescription = (code: number): string => code in statusCodes ? statusCodes[code] : "Unknown";
+const getStatusDescription = (code: number): string =>
+    code in statusCodes ? statusCodes[code] : 'Unknown'
 
 export { getStatusDescription }
 
