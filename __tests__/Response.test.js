@@ -117,6 +117,11 @@ describe("Response()", () => {
                     expect(_response.statusCode).toBe(300)
                 })
             })
+            describe(" _response.code() is called with an invalid status code", () => {
+                it("Then an error is thrown", () => {
+                    expect(() => _response.code(4)).toThrow('Invalid status code')
+                })
+            })
         })
         describe("status()", () => {
             const _response = new Response(standardEvent, standardContext)
@@ -124,6 +129,11 @@ describe("Response()", () => {
                 _response.status(300)
                 it("Then _response.statusCode is the set code", () => {
                     expect(_response.statusCode).toBe(300)
+                })
+            })
+            describe(" _response.status() is called with an invalid status code", () => {
+                it("Then an error is thrown", () => {
+                    expect(() => _response.status(4)).toThrow('Invalid status code')
                 })
             })
         })
