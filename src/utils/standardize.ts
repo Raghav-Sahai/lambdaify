@@ -14,12 +14,12 @@ interface StandardizedEvent {
     path: string,
     headers?: Object,
     isBase64Encoded: boolean
-    body?: any
+    body: any
     querystringParameters?: Object | null
 }
 interface StandardizedContext {}
 
-const unrecognizedEventTypeError = new Error("Unrecognized event type")
+const unrecognizedEventTypeError = new Error("Unrecognized event type, events must be from API Gateway V1, API Gateway V2, or alb")
 
 const standardizeContext = (context: any): StandardizedContext => {
     return context
@@ -98,10 +98,10 @@ const standardizeGatewayV1Event = (event: APIGatewayProxyEvent): StandardizedEve
     const raw = event
     const method = event.httpMethod as Method
     const path = event.path
-    const headers = event.headers
+    const headers = { ...event.headers, ...event.multiValueHeaders }
     const isBase64Encoded = event.isBase64Encoded
     const body = isBase64Encoded ? decodeBase64(event.body) : event.body
-    const querystringParameters = event.queryStringParameters
+    const querystringParameters = { ...event.queryStringParameters, ...event.multiValueQueryStringParameters }
     
     return {
         payloadVersion,

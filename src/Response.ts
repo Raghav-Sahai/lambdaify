@@ -61,9 +61,11 @@ function Response (_event: StandardizedEvent, context: StandardizedContext) {
 // send
 Response.prototype.send = function (body: any) {
     if (this.isResponseSent) throw RESPONSE_ALREADY_SENT
-    this.body = body
 
+    // Set body and set isResponseSent flag to true
+    this.body = body
     this.isResponseSent = true
+
     return this
 }
 

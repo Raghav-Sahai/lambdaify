@@ -18,14 +18,20 @@ describe("Standardize", () => {
             it("Then a standardized event is returned", () => {
                 const standardEvent = standardizeEvent(apiGatewayV1Event)
                 const expected = {
-                    "body": "Hello from Lambda!",
-                    "headers": { "header1": "value1", "header2": "value2" },
-                    "isBase64Encoded": false,
-                    "method": "GET",
-                    "path": "/my/path",
-                    "payloadVersion": "gatewayV1.0",
-                    "querystringParameters": { "parameter1": "value1", "parameter2": "value" },
-                    "raw": apiGatewayV1Event
+                  body: 'Hello from Lambda!',
+                  headers: {
+                    header1: ['value1'],
+                    header2: ['value1', 'value2'],
+                  },
+                  isBase64Encoded: false,
+                  method: 'GET',
+                  path: '/my/path',
+                  payloadVersion: 'gatewayV1.0',
+                  querystringParameters: {
+                    parameter1: ['value1', 'value2'],
+                    parameter2: ['value'],
+                  },
+                  raw: apiGatewayV1Event
                 }
                 expect(standardEvent).toStrictEqual(expected)
             })

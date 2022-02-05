@@ -56,7 +56,7 @@ const matchRoute = (router: Router, incomingPath: string, incomingMethod: Method
         })
 
         // If the path arrays are the same, return the route
-        if (equals(refRoutePathArray, refIncomingPathArray) && incomingMethod === method) return route    
+        if (equals(refRoutePathArray, refIncomingPathArray) && incomingMethod.toUpperCase() === method.toUpperCase()) return route    
     }
 
     return {}
