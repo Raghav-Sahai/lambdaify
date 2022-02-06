@@ -9,25 +9,28 @@ import { decodeBase64 } from './base64'
 type PayloadVersion = 'alb' | 'gatewayV1.0' | 'gatewayV2.0'
 interface StandardizedEvent {
     payloadVersion: PayloadVersion
-    raw: any
+    raw
     method: Method
     path: string
-    headers?: Object
+    headers?
     isBase64Encoded: boolean
-    body: any
-    querystringParameters?: Object | null
+    body
+    querystringParameters?
 }
+
+// TODO: Add standard context logic
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface StandardizedContext {}
 
 const unrecognizedEventTypeError = new Error(
     'Unrecognized event type, events must be from API Gateway V1, API Gateway V2, or alb'
 )
 
-const standardizeContext = (context: any): StandardizedContext => {
+const standardizeContext = (context): StandardizedContext => {
     return context
 }
 
-const standardizeEvent = (event: any) => {
+const standardizeEvent = event => {
     const eventType: string = event.requestContext.elb ? 'alb' : 'APIGateway'
 
     // If alb event
@@ -128,5 +131,3 @@ export {
     standardizeContext,
     StandardizedContext,
 }
-
-module.exports = { standardizeEvent, standardizeContext }

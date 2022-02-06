@@ -1,8 +1,7 @@
-const lambdaify = require('../src/lambdaify')
-const router = require('../src/Router')
+import { lambdaify } from '../src/lambdaify'
 
 describe('lambdaify()', () => {
-    const app = lambdaify()
+    const app = lambdaify({})
     describe('When lambdaify is initialized', () => {
         describe('run()', () => {
             it('Then the run function exists', () => {

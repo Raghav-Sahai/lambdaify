@@ -1,10 +1,6 @@
-const Response = require('../src/Response')
-
-const albEvent = require('./fixtures/albEvent.json')
-
-const standardize = require('../src/utils/standardize')
-const standardizeEvent = standardize.standardizeEvent
-const standardizeContext = standardize.standardizeContext
+import { Response } from '../src/Response'
+import albEvent from './fixtures/albEvent.json'
+import { standardizeEvent, standardizeContext } from '../src/utils/standardize'
 
 const standardContext = standardizeContext({})
 const standardEvent = standardizeEvent(albEvent)
@@ -119,7 +115,6 @@ describe('Response()', () => {
                 })
             })
         })
-        describe('serializer()', () => {})
         describe('code()', () => {
             const _response = new Response(standardEvent, standardContext)
             describe('When _response.code() is called with a status code', () => {

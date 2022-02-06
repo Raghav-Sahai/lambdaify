@@ -1,11 +1,11 @@
 import { StandardizedEvent, StandardizedContext } from './utils/standardize'
-import { RouteParams } from './types/router.types'
+import { Param } from './types/router.types'
 import { getPathArray } from './utils/parsePath'
 
 function Request(
     event: StandardizedEvent,
     context: StandardizedContext,
-    paramsMap: RouteParams
+    paramsMap: Array<Param>
 ) {
     this.event = event
     this.context = context
@@ -19,7 +19,7 @@ Object.defineProperties(Request.prototype, {
         },
     },
     raw: {
-        get(): any {
+        get() {
             return this.event.raw
         },
     },
@@ -29,12 +29,12 @@ Object.defineProperties(Request.prototype, {
         },
     },
     body: {
-        get(): any {
+        get() {
             return this.event.body
         },
     },
     headers: {
-        get(): any {
+        get() {
             return this.event.headers
         },
     },
@@ -54,7 +54,7 @@ Object.defineProperties(Request.prototype, {
         },
     },
     querystringParameters: {
-        get(): any {
+        get() {
             return this.event.querystringParameters
         },
     },
@@ -65,11 +65,11 @@ Object.defineProperties(Request.prototype, {
     },
 })
 
-const parseParams = (path: string, params: RouteParams): object => {
+const parseParams = (path: string, params: Array<Param>): object => {
     // If no params, return empty object
     if (params.length === 0) return {}
 
-    let _params: any = {}
+    const _params = {}
     const pathArray = getPathArray(path)
 
     params.forEach(param => (_params[param.key] = pathArray[param.index]))
@@ -78,5 +78,3 @@ const parseParams = (path: string, params: RouteParams): object => {
 }
 
 export { Request }
-
-module.exports = Request

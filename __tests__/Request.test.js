@@ -1,10 +1,6 @@
-const Request = require('../src/Request')
-
-const albEvent = require('./fixtures/albEvent.json')
-
-const standardize = require('../src/utils/standardize')
-const standardizeEvent = standardize.standardizeEvent
-const standardizeContext = standardize.standardizeContext
+import { Request } from '../src/Request'
+import albEvent from './fixtures/albEvent.json'
+import { standardizeEvent, standardizeContext } from '../src/utils/standardize'
 
 const standardContext = standardizeContext({})
 const standardEvent = standardizeEvent(albEvent)

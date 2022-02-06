@@ -1,10 +1,10 @@
-const standardize = require('../.../../../src/utils/standardize')
-const standardizeEvent = standardize.standardizeEvent
-const standardizeContext = standardize.standardizeContext
-
-const apiGatewayV1Event = require('../fixtures/apiGatewayV1Event.json')
-const apiGatewayV2Event = require('../fixtures/apiGatewayV2Event.json')
-const albEvent = require('../fixtures/albEvent.json')
+import {
+    standardizeEvent,
+    standardizeContext,
+} from '../../src/utils/standardize'
+import apiGatewayV1Event from '../fixtures/apiGatewayV1Event.json'
+import apiGatewayV2Event from '../fixtures/apiGatewayV2Event.json'
+import albEvent from '../fixtures/albEvent.json'
 
 describe('Standardize', () => {
     describe('StandardizeEvent()', () => {

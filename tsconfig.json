@@ -1,12 +1,14 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "declaration": true,
-    "outDir": "./lib",
-    "noImplicitAny": false,
-    "allowJs": true
-  },
-  "include": ["src", "__tests__"],
-  "exclude": ["node_modules", "**/__tests__/*"]
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declaration": true,
+        "outDir": "./lib",
+        "noImplicitAny": false,
+        "allowJs": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
+    },
+    "include": ["src", "__tests__"],
+    "exclude": ["node_modules", "**/__tests__/*"]
 }

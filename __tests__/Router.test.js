@@ -1,10 +1,10 @@
-const router = require('../src/Router')
+import { router } from '../src/Router'
 
 describe('Router()', () => {
     let Router
 
     beforeEach(() => {
-        Router = router()
+        Router = router({})
     })
     describe('When lambdaify is initialized', () => {
         describe('registerRoute()', () => {

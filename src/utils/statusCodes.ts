@@ -1,4 +1,4 @@
-const statusCodes: any = {
+const statusCodes = {
     '100': 'Continue',
     '101': 'Switching Protocols',
     '102': 'Processing',
@@ -61,5 +61,3 @@ const getStatusDescription = (code: number): string =>
     code in statusCodes ? statusCodes[code] : 'Unknown'
 
 export { getStatusDescription }
-
-module.exports = getStatusDescription

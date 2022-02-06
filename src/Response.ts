@@ -24,7 +24,7 @@ function Response(_event: StandardizedEvent, context: StandardizedContext) {
     this.headers = {}
     this.body = null
     this.serializer = null
-    this.createResponse = (): any => {
+    this.createResponse = () => {
         const payloadVersion = this.event.payloadVersion
         if (payloadVersion === 'alb') {
             const response: ALBResult = {
@@ -58,7 +58,7 @@ function Response(_event: StandardizedEvent, context: StandardizedContext) {
 }
 
 // send
-Response.prototype.send = function (body: any) {
+Response.prototype.send = function (body) {
     if (this.isResponseSent) throw RESPONSE_ALREADY_SENT
 
     // Set body and set isResponseSent flag to true
@@ -95,7 +95,7 @@ Response.prototype.header = function (
 }
 
 // sets serializer
-Response.prototype.serializer = function (fn: Function) {
+Response.prototype.serializer = function (fn) {
     if (typeof fn !== 'function') throw SERIALIZER_MUST_BE_FUNCTION
     this.serializer = fn
 
@@ -114,7 +114,7 @@ Response.prototype.code = function (code) {
 }
 Response.prototype.status = Response.prototype.code
 
-const serialize = (body: any, serializer: any): any => {
+const serialize = (body, serializer) => {
     const encoding =
         typeof serializer === 'function' ? serializer : JSON.stringify
     if (typeof body === 'object') {
@@ -126,5 +126,3 @@ const serialize = (body: any, serializer: any): any => {
 }
 
 export { Response }
-
-module.exports = Response

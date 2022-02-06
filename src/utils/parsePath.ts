@@ -1,8 +1,8 @@
-import { Param, RouteParams } from '../types/router.types'
+import { Param } from '../types/router.types'
 
 const parsePath = (
     rawPath: string
-): { params: RouteParams; pathArray: Array<string> } => {
+): { params: Array<Param>; pathArray: Array<string> } => {
     // Extract path information
     const pathArray = getPathArray(rawPath)
     const params = getParams(pathArray)
@@ -18,8 +18,8 @@ const getPathArray = (rawPath: string): Array<string> => {
               .split('/')
         : []
 }
-const getParams = (pathArray: Array<string>): RouteParams => {
-    let params: RouteParams = []
+const getParams = (pathArray: Array<string>): Array<Param> => {
+    const params: Array<Param> = []
 
     pathArray.forEach((fragment, index) => {
         if (/^:(.*)$/.test(fragment)) {

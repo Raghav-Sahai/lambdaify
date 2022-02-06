@@ -1,4 +1,4 @@
-import { Route, RouteParams } from './types/router.types'
+import { Route, Param } from './types/router.types'
 import {
     standardizeEvent,
     StandardizedEvent,
@@ -14,11 +14,10 @@ const { log, error } = console
 const ROUTE_NOT_FOUND = new Error('This route does not exist')
 const UNEXPECTED_ERROR = new Error('Unexpected error')
 
-const lambdaify = (options: Object) => {
+const lambdaify = options => {
     options = options || {}
-    if (typeof options !== 'object') {
+    if (typeof options !== 'object')
         throw new Error('Options must be an object')
-    }
 
     // Initialize router
     const Router = router({})
@@ -26,7 +25,7 @@ const lambdaify = (options: Object) => {
     //Public API
     const lambdaify = {
         // TODO: Have this be either APIGateway v1, v2, or alb
-        run: async (event: any, context: any): Promise<any> => {
+        run: async (event, context) => {
             log('lambdaify::run()')
 
             // Standardize event
@@ -59,13 +58,13 @@ const lambdaify = (options: Object) => {
                 throw UNEXPECTED_ERROR
             }
         },
-        get: (path: string, callback: Function): any =>
+        get: (path: string, callback) =>
             Router.registerRoute('GET', path, callback),
-        put: (path: string, callback: Function): any =>
+        put: (path: string, callback) =>
             Router.registerRoute('PUT', path, callback),
-        post: (path: string, callback: Function): any =>
+        post: (path: string, callback) =>
             Router.registerRoute('POST', path, callback),
-        delete: (path: string, callback: Function): any =>
+        delete: (path: string, callback) =>
             Router.registerRoute('DELETE', path, callback),
         router: () => Router.getRouter(), // For test purposes
     }
@@ -76,9 +75,9 @@ const lambdaify = (options: Object) => {
 const handleRun = async (
     event: StandardizedEvent,
     context: StandardizedContext,
-    callback: Function,
-    params: RouteParams
-): Promise<any> => {
+    callback,
+    params: Array<Param>
+) => {
     log('lambdaify::handleRun()')
 
     // Create request and response references
@@ -105,6 +104,7 @@ const formatError = (error: Error) => {
     }
 }
 
+export { lambdaify }
 module.exports = lambdaify
 module.exports.lambdaify = lambdaify
 module.exports.default = lambdaify

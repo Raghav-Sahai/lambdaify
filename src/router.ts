@@ -1,18 +1,20 @@
-import { Method, Route, Router } from './types/router.types'
+import { Method, Route } from './types/router.types'
 import { parsePath, getPathArray } from './utils/parsePath'
 
-const router = (options: object): any => {
+const router = (options: object) => {
     options = options || {}
+    if (typeof options !== 'object')
+        throw new Error('Options must be an object')
 
-    let router: Router = []
+    const router: Array<Route> = []
 
     // Private router API
     return {
         registerRoute: (
             method: Method,
             path: string,
-            callback: Function
-        ): Router => {
+            callback
+        ): Array<Route> => {
             const { params, pathArray } = parsePath(path)
             const route: Route = {
                 method,
@@ -24,17 +26,17 @@ const router = (options: object): any => {
             router.push(route)
             return router
         },
-        matchedRoute: (method: Method, path: string): Route | {} =>
+        matchedRoute: (method: Method, path: string): Route =>
             matchRoute(router, path, method as Method),
-        getRouter: (): Router => router,
+        getRouter: (): Array<Route> => router,
     }
 }
 
 const matchRoute = (
-    router: Router,
+    router: Array<Route>,
     incomingPath: string,
     incomingMethod: Method
-): Route | {} => {
+): Route => {
     // Get path arry for the incoming path
     const incomingPathArray = getPathArray(incomingPath)
 
@@ -60,15 +62,10 @@ const matchRoute = (
             return route
     }
 
-    return {}
+    return {} as Route
 }
 
 const equals = (array1: Array<string>, array2: Array<string>): boolean =>
     JSON.stringify(array1) === JSON.stringify(array2)
 
 export { router }
-
-// For tests
-module.exports = router
-module.exports.router = router
-module.exports.default = router

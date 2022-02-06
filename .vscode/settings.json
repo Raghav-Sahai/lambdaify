@@ -6,5 +6,5 @@
         "postversion",
         "preversion"
     ],
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": true
 }
