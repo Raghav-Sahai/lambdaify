@@ -1,10 +1,10 @@
 import {
     standardizeEvent,
     standardizeContext,
-} from '../../src/utils/standardize'
-import apiGatewayV1Event from '../fixtures/apiGatewayV1Event.json'
-import apiGatewayV2Event from '../fixtures/apiGatewayV2Event.json'
-import albEvent from '../fixtures/albEvent.json'
+} from '../../src/utils/standardize';
+import apiGatewayV1Event from '../fixtures/apiGatewayV1Event.json';
+import apiGatewayV2Event from '../fixtures/apiGatewayV2Event.json';
+import albEvent from '../fixtures/albEvent.json';
 
 describe('Standardize', () => {
     describe('StandardizeEvent()', () => {
@@ -13,15 +13,15 @@ describe('Standardize', () => {
                 const nonStandardEvent = {
                     ...apiGatewayV1Event,
                     version: 'not standard',
-                }
+                };
                 expect(() => standardizeEvent(nonStandardEvent)).toThrow(
                     'Unrecognized event type'
-                )
-            })
-        })
+                );
+            });
+        });
         describe('When standardizeEvent is called with a valid apiGatewayV1 event', () => {
             it('Then a standardized event is returned', () => {
-                const standardEvent = standardizeEvent(apiGatewayV1Event)
+                const standardEvent = standardizeEvent(apiGatewayV1Event);
                 const expected = {
                     body: 'Hello from Lambda!',
                     headers: {
@@ -37,13 +37,13 @@ describe('Standardize', () => {
                         parameter2: ['value'],
                     },
                     raw: apiGatewayV1Event,
-                }
-                expect(standardEvent).toStrictEqual(expected)
-            })
-        })
+                };
+                expect(standardEvent).toStrictEqual(expected);
+            });
+        });
         describe('When standardizeEvent is called with a valid apiGatewayV2 event', () => {
             it('Then a standardized event is returned', () => {
-                const standardEvent = standardizeEvent(apiGatewayV2Event)
+                const standardEvent = standardizeEvent(apiGatewayV2Event);
                 const expected = {
                     body: 'Hello from Lambda',
                     headers: {
@@ -59,13 +59,13 @@ describe('Standardize', () => {
                         parameter2: 'value',
                     },
                     raw: apiGatewayV2Event,
-                }
-                expect(standardEvent).toStrictEqual(expected)
-            })
-        })
+                };
+                expect(standardEvent).toStrictEqual(expected);
+            });
+        });
         describe('When standardizeEvent is called with a valid alb event', () => {
             it('Then a standardized event is returned', () => {
-                const standardEvent = standardizeEvent(albEvent)
+                const standardEvent = standardizeEvent(albEvent);
                 const expected = {
                     body: 'Hello from alb!',
                     headers: {
@@ -90,17 +90,17 @@ describe('Standardize', () => {
                     payloadVersion: 'alb',
                     querystringParameters: { query: '1234ABCD' },
                     raw: albEvent,
-                }
-                expect(standardEvent).toStrictEqual(expected)
-            })
-        })
-    })
+                };
+                expect(standardEvent).toStrictEqual(expected);
+            });
+        });
+    });
     describe('standardizeContext()', () => {
         describe('When standardize context is called with a valid context', () => {
             it('Then the context is returned', () => {
-                const standardContext = standardizeContext({})
-                expect(standardContext).toStrictEqual({})
-            })
-        })
-    })
-})
+                const standardContext = standardizeContext({});
+                expect(standardContext).toStrictEqual({});
+            });
+        });
+    });
+});

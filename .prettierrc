@@ -1,6 +1,6 @@
 {
-    "semi": false,
+    "semi": true,
     "singleQuote": true,
     "arrowParens": "avoid",
-    "tabWidth":4
+    "tabWidth": 4
 }

@@ -1,31 +1,31 @@
-import { Request } from '../src/Request'
-import albEvent from './fixtures/albEvent.json'
-import { standardizeEvent, standardizeContext } from '../src/utils/standardize'
+import { Request } from '../src/Request';
+import albEvent from './fixtures/albEvent.json';
+import { standardizeEvent, standardizeContext } from '../src/utils/standardize';
 
-const standardContext = standardizeContext({})
-const standardEvent = standardizeEvent(albEvent)
+const standardContext = standardizeContext({});
+const standardEvent = standardizeEvent(albEvent);
 
 describe('Request()', () => {
     describe('When a request is created', () => {
         describe('When there are no params to be passed in', () => {
-            const paramsMap = []
+            const paramsMap = [];
             const _request = new Request(
                 standardEvent,
                 standardContext,
                 paramsMap
-            )
+            );
             it('Then _request.req returns the event', () => {
-                expect(_request.req).toStrictEqual(standardEvent)
-            })
+                expect(_request.req).toStrictEqual(standardEvent);
+            });
             it('Then _request.raw returns the raw event', () => {
-                expect(_request.raw).toStrictEqual(albEvent)
-            })
+                expect(_request.raw).toStrictEqual(albEvent);
+            });
             it('Then _request.version returns the payload version', () => {
-                expect(_request.version).toBe('alb')
-            })
+                expect(_request.version).toBe('alb');
+            });
             it('Then _request.body returns the body', () => {
-                expect(_request.body).toBe('Hello from alb!')
-            })
+                expect(_request.body).toBe('Hello from alb!');
+            });
             it('Then _request.headers returns the headers', () => {
                 expect(_request.headers).toStrictEqual({
                     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -42,36 +42,36 @@ describe('Request()', () => {
                     'x-forwarded-port': '80',
                     'x-forwarded-proto': 'http',
                     'x-imforwards': '20',
-                })
-            })
+                });
+            });
             it('Then _request.path returns the path', () => {
-                expect(_request.path).toBe('/lambda')
-            })
+                expect(_request.path).toBe('/lambda');
+            });
             it('Then _request.method returns the method', () => {
-                expect(_request.method).toBe('GET')
-            })
+                expect(_request.method).toBe('GET');
+            });
             it('Then _request.isBase64Encoded returns boolean if base64 encoded', () => {
-                expect(_request.isBase64Encoded).toBe(false)
-            })
+                expect(_request.isBase64Encoded).toBe(false);
+            });
             it('Then _request.querystringParameters returns the query string params', () => {
                 expect(_request.querystringParameters).toStrictEqual({
                     query: '1234ABCD',
-                })
-            })
+                });
+            });
             it('Then _request.params returns an empty object', () => {
-                expect(_request.params).toStrictEqual({})
-            })
-        })
+                expect(_request.params).toStrictEqual({});
+            });
+        });
         describe('When there are params passed into the request', () => {
-            const paramsMap = [{ key: 'testKey', index: 0 }]
+            const paramsMap = [{ key: 'testKey', index: 0 }];
             const _request = new Request(
                 standardEvent,
                 standardContext,
                 paramsMap
-            )
+            );
             it('Then _request.params returns the params', () => {
-                expect(_request.params).toStrictEqual({ testKey: 'lambda' })
-            })
-        })
-    })
-})
+                expect(_request.params).toStrictEqual({ testKey: 'lambda' });
+            });
+        });
+    });
+});

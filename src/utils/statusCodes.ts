@@ -55,9 +55,9 @@ const statusCodes = {
     '509': 'Bandwidth Limit Exceeded',
     '510': 'Not Extended',
     '511': 'Network Authentication Required',
-}
+};
 
 const getStatusDescription = (code: number): string =>
-    code in statusCodes ? statusCodes[code] : 'Unknown'
+    code in statusCodes ? statusCodes[code] : 'Unknown';
 
-export { getStatusDescription }
+export { getStatusDescription };

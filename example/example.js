@@ -1,4 +1,4 @@
-const lambdaify = require('../lib/lambdaify')()
+const lambdaify = require('../lib/lambdaify')();
 
 const event = {
     httpMethod: 'GET',
@@ -13,8 +13,8 @@ const event = {
             targetGroupArn: 'test',
         },
     },
-}
-const context = {}
+};
+const context = {};
 // lambdaify.get('/', (req, res) => {
 //     res.send({ hello: 'world' })
 // })
@@ -24,17 +24,17 @@ const context = {}
 // };
 
 lambdaify.get('/get/:id', (req, res) => {
-    console.log('example::get')
-    console.log('req.body: ', req.body)
-    console.log('req.headers: ', req.headers)
-    console.log('req.params: ', req.params)
-    res.header('headerKey', 'headerValue')
-    return res.send('test body').code(400)
-})
+    console.log('example::get');
+    console.log('req.body: ', req.body);
+    console.log('req.headers: ', req.headers);
+    console.log('req.params: ', req.params);
+    res.header('headerKey', 'headerValue');
+    return res.send('test body').code(400);
+});
 // lambdaify.router()
 const run = async () => {
-    const response = await lambdaify.run(event, context)
-    console.log('example::response', response)
-}
+    const response = await lambdaify.run(event, context);
+    console.log('example::response', response);
+};
 
-run()
+run();
