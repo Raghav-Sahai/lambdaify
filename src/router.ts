@@ -1,16 +1,15 @@
 import { Method, Route } from './types/router.types';
 import { getParams, getPathArray } from './utils/parsePath';
 
-const ROUTE_ALREADY_EXISTS = (method: Method, path: string) =>
+const ROUTE_ALREADY_EXISTS_ERROR = (method: Method, path: string) =>
     new Error(
         `${method} ${path} already exists and cannot be registered again.`
     );
+const METHOD_PATH_EXTRACTION_ERROR = new Error(
+    'Failed to parse event for method and path. Make sure your eventSource is set application load balancer'
+);
 
 const router = (options: object) => {
-    options = options || {};
-    if (typeof options !== 'object')
-        throw new Error('Options must be an object');
-
     const router: Array<Route> = [];
 
     // Router API
@@ -20,10 +19,10 @@ const router = (options: object) => {
             path: string,
             callback
         ): Array<Route> => {
-            // If route already exists, throw error
             const validateIfRouteExists = matchRoute(router, path, method);
-            if (Object.keys(validateIfRouteExists).length !== 0)
-                throw ROUTE_ALREADY_EXISTS(method, path);
+            if (Object.keys(validateIfRouteExists).length !== 0) {
+                throw ROUTE_ALREADY_EXISTS_ERROR(method, path);
+            }
 
             const pathArray = getPathArray(path);
             const params = getParams(pathArray);
@@ -37,10 +36,20 @@ const router = (options: object) => {
             router.push(route);
             return router;
         },
-        matchedRoute: (method: Method, path: string): Route =>
-            matchRoute(router, path, method as Method),
+        matchedRoute: (event): Route => {
+            const { method, path } = getRouteDetails(event);
+            return matchRoute(router, path, method as Method);
+        },
         getRouter: (): Array<Route> => router,
     };
+};
+
+const getRouteDetails = event => {
+    const { httpMethod, path } = event;
+    if (!httpMethod || !path) {
+        throw METHOD_PATH_EXTRACTION_ERROR;
+    }
+    return { method: httpMethod, path };
 };
 
 const matchRoute = (
@@ -48,24 +57,19 @@ const matchRoute = (
     incomingPath: string,
     incomingMethod: Method
 ): Route => {
-    // Get path arry for the incoming path
     const incomingPathArray = getPathArray(incomingPath);
 
     for (const route of router) {
-        // Extract pathArray and params from route
         const { pathArray, params, method } = route;
 
-        // Make a copy of the path arrays
         const refRoutePathArray = [...pathArray];
         const refIncomingPathArray = [...incomingPathArray];
 
         params.forEach(param => {
-            // Replace the param index with filler variable
             refRoutePathArray[param.index] = '__var__';
             refIncomingPathArray[param.index] = '__var__';
         });
 
-        // If the path arrays are the same, return the route
         if (
             equals(refRoutePathArray, refIncomingPathArray) &&
             incomingMethod.toUpperCase() === method.toUpperCase()

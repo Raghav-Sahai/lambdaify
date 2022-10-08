@@ -78,40 +78,47 @@ describe('Router()', () => {
                 describe('When there are no routes in the router', () => {
                     it('Then an empty route object is returned', () => {
                         const expected = {};
-                        const matchedRoute = Router.matchedRoute(
-                            'GET',
-                            '/test/path'
-                        );
+                        const event = {
+                            httpMethod: 'GET',
+                            path: '/test/path',
+                        };
+                        const matchedRoute = Router.matchedRoute(event);
                         expect(matchedRoute).toStrictEqual(expected);
                     });
                 });
                 describe('When no matching route exists in the router', () => {
                     it('Then an empty route object is returned', () => {
                         const cb = () => 'test';
+                        const event = {
+                            httpMethod: 'POST',
+                            path: '/test/path',
+                        };
                         Router.registerRoute('GET', '/test/path', cb);
                         const expected = {};
-                        const matchedRoute = Router.matchedRoute(
-                            'POST',
-                            '/test/path'
-                        );
+                        const matchedRoute = Router.matchedRoute(event);
                         expect(matchedRoute).toStrictEqual(expected);
                     });
                 });
                 describe('When no matching route exists in the router and the path has a param', () => {
                     it('Then an empty route object is returned', () => {
                         const cb = () => 'test';
+                        const event = {
+                            httpMethod: 'POST',
+                            path: '/test/path/:id',
+                        };
                         Router.registerRoute('GET', '/test/path/:id', cb);
                         const expected = {};
-                        const matchedRoute = Router.matchedRoute(
-                            'POST',
-                            '/test/path/:id'
-                        );
+                        const matchedRoute = Router.matchedRoute(event);
                         expect(matchedRoute).toStrictEqual(expected);
                     });
                 });
                 describe('When a matching route has no params and exists in the router', () => {
                     it('Then the matched route is returned', () => {
                         const cb = () => 'test';
+                        const event = {
+                            httpMethod: 'GET',
+                            path: '/test/path',
+                        };
                         Router.registerRoute('GET', '/test/path', cb);
                         const expected = {
                             callback: cb,
@@ -120,16 +127,17 @@ describe('Router()', () => {
                             path: '/test/path',
                             pathArray: ['test', 'path'],
                         };
-                        const matchedRoute = Router.matchedRoute(
-                            'GET',
-                            '/test/path'
-                        );
+                        const matchedRoute = Router.matchedRoute(event);
                         expect(matchedRoute).toStrictEqual(expected);
                     });
                 });
                 describe('When a matching route has one param and exists in the router', () => {
                     it('Then the matched route is returned', () => {
                         const cb = () => 'test';
+                        const event = {
+                            httpMethod: 'GET',
+                            path: '/test/path',
+                        };
                         Router.registerRoute('GET', '/test/path/:id', cb);
                         const expected = {
                             callback: cb,
@@ -143,11 +151,34 @@ describe('Router()', () => {
                             path: '/test/path/:id',
                             pathArray: ['test', 'path', ':id'],
                         };
-                        const matchedRoute = Router.matchedRoute(
-                            'GET',
-                            '/test/path'
-                        );
+                        const matchedRoute = Router.matchedRoute(event);
                         expect(matchedRoute).toStrictEqual(expected);
+                    });
+                });
+            });
+            describe('When matchedRoute is called and fails to extract the method or path from the event', () => {
+                describe('When there is no path in the event', () => {
+                    it('Then throws an error', () => {
+                        const expected =
+                            'Failed to parse event for method and path. Make sure your eventSource is set application load balancer';
+                        const event = {
+                            httpMethod: 'GET',
+                        };
+                        expect(() => Router.matchedRoute(event)).toThrow(
+                            expected
+                        );
+                    });
+                });
+                describe('When there is no method in the event', () => {
+                    it('Then throws an error', () => {
+                        const expected =
+                            'Failed to parse event for method and path. Make sure your eventSource is set application load balancer';
+                        const event = {
+                            path: 'test/path',
+                        };
+                        expect(() => Router.matchedRoute(event)).toThrow(
+                            expected
+                        );
                     });
                 });
             });

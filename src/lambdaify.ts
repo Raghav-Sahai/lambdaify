@@ -1,61 +1,35 @@
 import { Route, Param } from './types/router.types';
-import {
-    standardizeEvent,
-    StandardizedEvent,
-    standardizeContext,
-    StandardizedContext,
-} from './utils/standardize';
 import { Request } from './Request';
 import { Response } from './Response';
 import { router } from './Router';
 
-const { log, error } = console;
-
-const ROUTE_NOT_FOUND = new Error('This route does not exist');
+const ROUTE_NOT_FOUND = new Error('Resource not found');
 const UNEXPECTED_ERROR = new Error('Unexpected error');
+const LAMBDAIFY_OPTIONS_ERROR = new Error(
+    'Lambdaify options must be an object'
+);
 
 const lambdaify = options => {
     options = options || {};
-    if (typeof options !== 'object')
-        throw new Error('Options must be an object');
+    if (typeof options !== 'object') {
+        throw LAMBDAIFY_OPTIONS_ERROR;
+    }
 
-    // Initialize router
     const Router = router({});
 
-    //Public API
     const lambdaify = {
-        // TODO: Have this be either APIGateway v1, v2, or alb
         run: async (event, context) => {
-            log('lambdaify::run()');
+            const matchedRoute: Route = Router.matchedRoute(event);
+            if (Object.keys(matchedRoute).length === 0) {
+                console.log('HERE');
+                return formatError(ROUTE_NOT_FOUND, 404);
+            }
 
-            // Standardize event
-            const standardEvent: StandardizedEvent = standardizeEvent(event);
-            const standardContext: StandardizedContext =
-                standardizeContext(context);
-
-            // Extract method and path from event
-            const { method, path } = standardEvent;
-
-            // Find route in router, return matched route
-            const matchedRoute: Route = Router.matchedRoute(method, path);
-
-            // TODO: Need to have this return 404 response
-            if (!matchedRoute) throw ROUTE_NOT_FOUND;
-
-            // Extract route callback and params object
             const { callback, params } = matchedRoute;
-
             try {
-                return await handleRun(
-                    standardEvent,
-                    standardContext,
-                    callback,
-                    params
-                );
+                return await handleRun(event, context, callback, params);
             } catch (err) {
-                // TODO: Need to have this return some kind of error response
-                error(err);
-                throw UNEXPECTED_ERROR;
+                return formatError(UNEXPECTED_ERROR, 500);
             }
         },
         get: (path: string, callback) =>
@@ -66,21 +40,17 @@ const lambdaify = options => {
             Router.registerRoute('POST', path, callback),
         delete: (path: string, callback) =>
             Router.registerRoute('DELETE', path, callback),
-        router: () => Router.getRouter(), // For test purposes
     };
 
     return lambdaify;
 };
 
 const handleRun = async (
-    event: StandardizedEvent,
-    context: StandardizedContext,
-    callback,
+    event: any,
+    context: any,
+    callback: any,
     params: Array<Param>
 ) => {
-    log('lambdaify::handleRun()');
-
-    // Create request and response references
     const request = new Request(event, context, params);
     const response = new Response(event, context);
 
@@ -88,16 +58,15 @@ const handleRun = async (
         await callback(request, response);
         return response.createResponse();
     } catch (err) {
-        error(err);
-        return formatError(err);
+        return formatError(err, 500);
     }
 };
-const formatError = (error: Error) => {
+const formatError = (error: Error, statusCode: number) => {
     return {
-        statusCode: 400,
+        statusCode,
         headers: {
             'Content-Type': 'text/plain',
-            'x-amzn-ErrorType': 400,
+            'x-amzn-ErrorType': statusCode,
         },
         isBase64Encoded: false,
         body: error.message,

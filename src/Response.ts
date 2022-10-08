@@ -1,74 +1,48 @@
-import {
-    APIGatewayProxyResult,
-    APIGatewayProxyResultV2,
-    ALBResult,
-} from 'aws-lambda';
-import { StandardizedEvent, StandardizedContext } from './utils/standardize';
 import { getStatusDescription } from './utils/statusCodes';
 
-const RESPONSE_ALREADY_SENT = new Error('Response was already sent');
-const CODE_ERROR = new Error('Invalid status code');
-const SERIALIZER_MUST_BE_FUNCTION = new Error(
-    'Serializer must be of type function'
+const RESPONSE_ALREADY_SENT = new Error(
+    'Response Error: Response was already sent'
 );
-const COOKIE_MUST_BE_STRING = new Error('Cookie must be of type string');
+const CODE_ERROR = new Error('Lambdaify Error: Invalid status code');
+const SERIALIZER_MUST_BE_FUNCTION = new Error(
+    'Response Error: Serializer must be of type function'
+);
+const COOKIE_MUST_BE_STRING = new Error(
+    'Response Error: Cookie must be of type string'
+);
+const INVALID_HEADER_PARAMS = new Error(
+    'Response Error: req.header must be called with two params, key and value'
+);
 
-function Response(_event: StandardizedEvent, context: StandardizedContext) {
+function Response(_event, context) {
     this.event = _event;
     this.context = context;
     this.isResponseSent = false;
-    this.multiValueHeaders = {};
-    this.cookies = [];
     this.isBase64Encoded = false;
-    this.statusCode = 200;
-    this.headers = {};
     this.body = null;
     this.serializer = null;
+    this.headers = {};
+    this.statusCode = 200;
+    this.cookies = [];
     this.createResponse = () => {
-        const payloadVersion = this.event.payloadVersion;
-        if (payloadVersion === 'alb') {
-            const response: ALBResult = {
-                isBase64Encoded: this.isBase64Encoded,
-                statusCode: this.statusCode,
-                headers: { ...this.multiValueHeaders, ...this.headers },
-                body: serialize(this.body, this.serializer),
-                statusDescription: getStatusDescription(this.statusCode),
-            };
-            return response;
-        } else if (payloadVersion === 'gatewayV1.0') {
-            const response: APIGatewayProxyResult = {
-                isBase64Encoded: this.isBase64Encoded,
-                statusCode: this.statusCode,
-                headers: this.headers,
-                body: serialize(this.body, this.serializer),
-                multiValueHeaders: this.multiValueHeaders,
-            };
-            return response;
-        } else if (payloadVersion === 'gatewayV2.0') {
-            const response: APIGatewayProxyResultV2 = {
-                isBase64Encoded: this.isBase64Encoded,
-                statusCode: this.statusCode,
-                headers: { ...this.multiValueHeaders, ...this.headers },
-                body: serialize(this.body, this.serializer),
-                cookies: this.cookies,
-            };
-            return response;
-        }
+        return {
+            isBase64Encoded: this.isBase64Encoded,
+            statusCode: this.statusCode,
+            headers: this.headers,
+            body: serialize(this.body, this.serializer),
+            statusDescription: getStatusDescription(this.statusCode),
+        };
     };
 }
 
-// send
 Response.prototype.send = function (body) {
     if (this.isResponseSent) throw RESPONSE_ALREADY_SENT;
-
-    // Set body and set isResponseSent flag to true
     this.body = body;
     this.isResponseSent = true;
 
     return this;
 };
 
-// set cookie
 Response.prototype.cookie = function (cookie: string) {
     if (typeof cookie !== 'string') throw COOKIE_MUST_BE_STRING;
     this.cookies.push(cookie);
@@ -76,33 +50,23 @@ Response.prototype.cookie = function (cookie: string) {
     return this;
 };
 
-// sets header
-Response.prototype.header = function (
-    key: string,
-    value: Array<string> | string
-) {
-    const _key = key.toLowerCase();
-
-    value = value === undefined ? '' : value;
-
-    if (Array.isArray(value)) {
-        this.multiValueHeaders[_key] = value;
-    } else if (typeof value === 'string') {
-        this.headers[_key] = value;
+Response.prototype.header = function (key: string, value: string) {
+    if (!key || !value) {
+        throw INVALID_HEADER_PARAMS;
     }
+    const _key = key.toLowerCase();
+    this.headers[_key] = value;
 
     return this;
 };
 
-// sets serializer
-Response.prototype.serializer = function (fn) {
+Response.prototype.setSerializer = function (fn) {
     if (typeof fn !== 'function') throw SERIALIZER_MUST_BE_FUNCTION;
     this.serializer = fn;
 
     return this;
 };
 
-// sets status codes
 Response.prototype.code = function (code) {
     const intValue = parseInt(code);
     if (isNaN(intValue) || intValue < 100 || intValue > 600) {
@@ -115,14 +79,12 @@ Response.prototype.code = function (code) {
 Response.prototype.status = Response.prototype.code;
 
 const serialize = (body, serializer) => {
-    const encoding =
-        typeof serializer === 'function' ? serializer : JSON.stringify;
     if (typeof body === 'object') {
+        const encoding =
+            typeof serializer === 'function' ? serializer : JSON.stringify;
         return encoding(body);
-    } else if (typeof body !== 'string') {
-        return body.toString();
     }
-    return body;
+    return body.toString();
 };
 
 export { Response };

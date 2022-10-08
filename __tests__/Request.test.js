@@ -1,27 +1,19 @@
 import { Request } from '../src/Request';
 import albEvent from './fixtures/albEvent.json';
-import { standardizeEvent, standardizeContext } from '../src/utils/standardize';
 
-const standardContext = standardizeContext({});
-const standardEvent = standardizeEvent(albEvent);
+const context = {};
+const event = albEvent;
 
 describe('Request()', () => {
     describe('When a request is created', () => {
         describe('When there are no params to be passed in', () => {
             const paramsMap = [];
-            const _request = new Request(
-                standardEvent,
-                standardContext,
-                paramsMap
-            );
+            const _request = new Request(event, context, paramsMap);
             it('Then _request.req returns the event', () => {
-                expect(_request.req).toStrictEqual(standardEvent);
+                expect(_request.req).toStrictEqual(event);
             });
             it('Then _request.raw returns the raw event', () => {
                 expect(_request.raw).toStrictEqual(albEvent);
-            });
-            it('Then _request.version returns the payload version', () => {
-                expect(_request.version).toBe('alb');
             });
             it('Then _request.body returns the body', () => {
                 expect(_request.body).toBe('Hello from alb!');
@@ -53,8 +45,8 @@ describe('Request()', () => {
             it('Then _request.isBase64Encoded returns boolean if base64 encoded', () => {
                 expect(_request.isBase64Encoded).toBe(false);
             });
-            it('Then _request.querystringParameters returns the query string params', () => {
-                expect(_request.querystringParameters).toStrictEqual({
+            it('Then _request.queryStringParameters returns the query string params', () => {
+                expect(_request.queryStringParameters).toStrictEqual({
                     query: '1234ABCD',
                 });
             });
@@ -64,11 +56,7 @@ describe('Request()', () => {
         });
         describe('When there are params passed into the request', () => {
             const paramsMap = [{ key: 'testKey', index: 0 }];
-            const _request = new Request(
-                standardEvent,
-                standardContext,
-                paramsMap
-            );
+            const _request = new Request(event, context, paramsMap);
             it('Then _request.params returns the params', () => {
                 expect(_request.params).toStrictEqual({ testKey: 'lambda' });
             });
