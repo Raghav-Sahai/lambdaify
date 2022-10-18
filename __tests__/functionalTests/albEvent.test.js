@@ -1,5 +1,5 @@
-const lambdaify = require('../../src/lambdaify');
-const albEvent = require('../fixtures/albEvent.json');
+import lambdaify from '../../src/lambdaify';
+import albEvent from '../fixtures/albEvent.json';
 
 describe('Functional unit tests?', () => {
     let app;

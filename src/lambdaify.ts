@@ -1,4 +1,4 @@
-import { Route, Param } from './types/router.types';
+import { Route } from './types/router.types';
 import { Request } from './Request';
 import { Response } from './Response';
 import { router } from './Router';
@@ -37,17 +37,9 @@ const lambdaify = () => {
     return lambdaify;
 };
 
-const handleRun = async (
-    request: any,
-    response: any,
-    callback: any
-) => {
-    try {
-        await callback(request, response);
-        return response.createResponse();
-    } catch (error) {
-        throw error;
-    }
+const handleRun = async (request: any, response: any, callback: any) => {
+    await callback(request, response);
+    return response.createResponse();
 };
 const formatError = (error: Error, statusCode: number) => {
     return {
