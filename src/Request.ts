@@ -1,12 +1,7 @@
-import { StandardizedEvent, StandardizedContext } from './utils/standardize';
 import { Param } from './types/router.types';
 import { getPathArray } from './utils/parsePath';
 
-function Request(
-    event: StandardizedEvent,
-    context: StandardizedContext,
-    paramsMap: Array<Param>
-) {
+function Request(event, context, paramsMap: Array<Param>) {
     this.event = event;
     this.context = context;
     this.paramsMap = paramsMap;
@@ -14,28 +9,18 @@ function Request(
 
 Object.defineProperties(Request.prototype, {
     req: {
-        get(): StandardizedEvent {
+        get() {
             return this.event;
         },
     },
     raw: {
         get() {
-            return this.event.raw;
+            return this.event;
         },
     },
-    version: {
+    method: {
         get(): string {
-            return this.event.payloadVersion;
-        },
-    },
-    body: {
-        get() {
-            return this.event.body;
-        },
-    },
-    headers: {
-        get() {
-            return this.event.headers;
+            return this.event.httpMethod;
         },
     },
     path: {
@@ -43,19 +28,24 @@ Object.defineProperties(Request.prototype, {
             return this.event.path;
         },
     },
-    method: {
-        get(): string {
-            return this.event.method;
+    queryStringParameters: {
+        get() {
+            return this.event.queryStringParameters;
+        },
+    },
+    headers: {
+        get() {
+            return this.event.headers;
+        },
+    },
+    body: {
+        get() {
+            return this.event.body;
         },
     },
     isBase64Encoded: {
         get(): boolean {
             return this.event.isBase64Encoded;
-        },
-    },
-    querystringParameters: {
-        get() {
-            return this.event.querystringParameters;
         },
     },
     params: {
@@ -66,7 +56,6 @@ Object.defineProperties(Request.prototype, {
 });
 
 const parseParams = (path: string, params: Array<Param>): object => {
-    // If no params, return empty object
     if (params.length === 0) return {};
 
     const _params = {};
