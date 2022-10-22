@@ -65,6 +65,37 @@ describe('Functional unit tests?', () => {
                     params: req.params,
                 });
         });
+        app.post('/base64/test', (req, res) => {
+            return res
+                .header('key', 'value')
+                .header('key2', 'value2')
+                .code(200)
+                .send({
+                    body: req.body,
+                    headers: req.headers,
+                    path: req.path,
+                    method: req.method,
+                    isBase64Encoded: req.isBase64Encoded,
+                    queryStringParameters: req.queryStringParameters,
+                    params: req.params,
+                });
+        });
+        app.post('/base64/test/2', (req, res) => {
+            return res
+                .header('key', 'value')
+                .header('key2', 'value2')
+                .code(200)
+                .encodeBase64()
+                .send({
+                    body: req.body,
+                    headers: req.headers,
+                    path: req.path,
+                    method: req.method,
+                    isBase64Encoded: req.isBase64Encoded,
+                    queryStringParameters: req.queryStringParameters,
+                    params: req.params,
+                });
+        });
     });
     describe('Happy Paths', () => {
         describe('When app.run is called with an alb event to an existing route (/)', () => {
@@ -150,6 +181,54 @@ describe('Functional unit tests?', () => {
                         key2: 'value2',
                     },
                     isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with an alb event to an existing route (/base64/test)', () => {
+            it('then the correct response is returned', async () => {
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'POST',
+                    path: '/base64/test',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: {},
+                    body: 'SGVsbG8gd29ybGQ=',
+                    isBase64Encoded: true,
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: '{"body":"Hello world","headers":{"accept":"application/json"},"path":"/base64/test","method":"POST","isBase64Encoded":true,"queryStringParameters":{},"params":{}}',
+                    headers: {
+                        key: 'value',
+                        key2: 'value2',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with an alb event to an existing route (/base64/test/2)', () => {
+            it('then the correct response is returned', async () => {
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'POST',
+                    path: '/base64/test/2',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: {},
+                    body: 'SGVsbG8gd29ybGQ=',
+                    isBase64Encoded: true,
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body:'eyJib2R5IjoiSGVsbG8gd29ybGQiLCJoZWFkZXJzIjp7ImFjY2VwdCI6ImFwcGxpY2F0aW9uL2pzb24ifSwicGF0aCI6Ii9iYXNlNjQvdGVzdC8yIiwibWV0aG9kIjoiUE9TVCIsImlzQmFzZTY0RW5jb2RlZCI6dHJ1ZSwicXVlcnlTdHJpbmdQYXJhbWV0ZXJzIjp7fSwicGFyYW1zIjp7fX0=',
+                    headers: {
+                        key: 'value',
+                        key2: 'value2',
+                    },
+                    isBase64Encoded: true,
                     statusCode: 200,
                     statusDescription: 'OK',
                 });
