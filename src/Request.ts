@@ -1,5 +1,6 @@
 import { Param } from './types/router.types';
 import { getPathArray } from './utils/parsePath';
+import { decodeBase64 } from './utils/base64';
 
 function Request(event, context, paramsMap: Array<Param>) {
     this.event = event;
@@ -40,6 +41,9 @@ Object.defineProperties(Request.prototype, {
     },
     body: {
         get() {
+            if (this.event.isBase64Encoded) {
+                return decodeBase64(this.event.body);
+            }
             return this.event.body;
         },
     },

@@ -15,8 +15,21 @@ describe('Request()', () => {
             it('Then _request.raw returns the raw event', () => {
                 expect(_request.raw).toStrictEqual(albEvent);
             });
-            it('Then _request.body returns the body', () => {
+            it('Then _request.body returns the body if isBase64Encoded is false', () => {
                 expect(_request.body).toBe('Hello from alb!');
+            });
+            it('Then _request.body returns the body if isBase64Encoded is true', () => {
+                const paramsMap = [];
+                const _request = new Request(
+                    {
+                        ...event,
+                        isBase64Encoded: true,
+                        body: 'SGVsbG8gd29ybGQ=',
+                    },
+                    context,
+                    paramsMap
+                );
+                expect(_request.body).toBe('Hello world');
             });
             it('Then _request.headers returns the headers', () => {
                 expect(_request.headers).toStrictEqual({

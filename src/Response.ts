@@ -1,4 +1,5 @@
 import { getStatusDescription } from './utils/statusCodes';
+import { encodeBase64 } from './utils/base64';
 
 const RESPONSE_ALREADY_SENT = new Error(
     'Response Error: Response was already sent'
@@ -29,7 +30,7 @@ function Response(_event, context) {
             isBase64Encoded: this.isBase64Encoded,
             statusCode: this.statusCode,
             headers: this.headers,
-            body: serialize(this.body, this.serializer),
+            body: serialize(this.body, this.serializer, this.isBase64Encoded),
             statusDescription: getStatusDescription(this.statusCode),
         };
     };
@@ -78,13 +79,26 @@ Response.prototype.code = function (code) {
 };
 Response.prototype.status = Response.prototype.code;
 
-const serialize = (body, serializer) => {
+Response.prototype.encodeBase64 = function () {
+    this.isBase64Encoded = true;
+
+    return this;
+};
+
+const serialize = (body, serializer, isBase64Encoded) => {
+    let serializedBody;
     if (typeof body === 'object') {
         const encoding =
             typeof serializer === 'function' ? serializer : JSON.stringify;
-        return encoding(body);
+        serializedBody = encoding(body);
+    } else {
+        serializedBody = body.toString();
     }
-    return body.toString();
+
+    if (isBase64Encoded) {
+        return encodeBase64(serializedBody);
+    }
+    return serializedBody;
 };
 
 export { Response };

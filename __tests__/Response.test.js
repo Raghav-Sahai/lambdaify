@@ -98,6 +98,28 @@ describe('Response()', () => {
                         statusDescription: 'OK',
                     });
                 });
+                it('When _response.createResponse is called after isBase64Encoded is set to true', () => {
+                    const _response = new Response(event, context);
+                    _response.encodeBase64();
+                    _response.send('Hello world');
+                    const formattedResponse = _response.createResponse();
+                    expect(formattedResponse).toEqual({
+                        headers: {},
+                        body: 'SGVsbG8gd29ybGQ=',
+                        isBase64Encoded: true,
+                        statusCode: 200,
+                        statusDescription: 'OK',
+                    });
+                });
+            });
+        });
+        describe('encodeBase64()', () => {
+            const _response = new Response(event, context);
+            describe('When _response.encodeBase64() is called', () => {
+                _response.encodeBase64();
+                it('Then _response.isBase64Encoded is set to true', () => {
+                    expect(_response.isBase64Encoded).toBe(true);
+                });
             });
         });
         describe('send()', () => {
