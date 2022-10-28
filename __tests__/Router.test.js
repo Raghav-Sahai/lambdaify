@@ -183,39 +183,5 @@ describe('Router()', () => {
                 });
             });
         });
-        describe('getRouter()', () => {
-            beforeEach(() => {
-                Router = router({});
-            });
-            it('Then the getRouter function exists', () => {
-                expect(typeof Router.getRouter).toBe('function');
-            });
-            describe('When getRouter is called', () => {
-                it('Then the router is returned', () => {
-                    const cb = () => 'test';
-                    Router.registerRoute('GET', '/test/path/:id', cb);
-                    Router.registerRoute('POST', '/test/path/:id', cb);
-
-                    const expected = [
-                        {
-                            callback: cb,
-                            method: 'GET',
-                            params: [{ index: 2, key: 'id' }],
-                            path: '/test/path/:id',
-                            pathArray: ['test', 'path', ':id'],
-                        },
-                        {
-                            callback: cb,
-                            method: 'POST',
-                            params: [{ index: 2, key: 'id' }],
-                            path: '/test/path/:id',
-                            pathArray: ['test', 'path', ':id'],
-                        },
-                    ];
-                    const _router = Router.getRouter();
-                    expect(_router).toStrictEqual(expected);
-                });
-            });
-        });
     });
 });

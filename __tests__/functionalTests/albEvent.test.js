@@ -223,7 +223,7 @@ describe('Functional unit tests?', () => {
                 };
                 const response = await app.run(testAlbEvent, {});
                 expect(response).toStrictEqual({
-                    body:'eyJib2R5IjoiSGVsbG8gd29ybGQiLCJoZWFkZXJzIjp7ImFjY2VwdCI6ImFwcGxpY2F0aW9uL2pzb24ifSwicGF0aCI6Ii9iYXNlNjQvdGVzdC8yIiwibWV0aG9kIjoiUE9TVCIsImlzQmFzZTY0RW5jb2RlZCI6dHJ1ZSwicXVlcnlTdHJpbmdQYXJhbWV0ZXJzIjp7fSwicGFyYW1zIjp7fX0=',
+                    body: 'eyJib2R5IjoiSGVsbG8gd29ybGQiLCJoZWFkZXJzIjp7ImFjY2VwdCI6ImFwcGxpY2F0aW9uL2pzb24ifSwicGF0aCI6Ii9iYXNlNjQvdGVzdC8yIiwibWV0aG9kIjoiUE9TVCIsImlzQmFzZTY0RW5jb2RlZCI6dHJ1ZSwicXVlcnlTdHJpbmdQYXJhbWV0ZXJzIjp7fSwicGFyYW1zIjp7fX0=',
                     headers: {
                         key: 'value',
                         key2: 'value2',
@@ -231,6 +231,94 @@ describe('Functional unit tests?', () => {
                     isBase64Encoded: true,
                     statusCode: 200,
                     statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with a middleware that sends a response directly', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    return res
+                        .header('middlewareKey', 'middlewareValue')
+                        .send('Middleware1 body');
+                };
+                app.use(middleware);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'GET',
+                    path: '/',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: 'Middleware1 body',
+                    headers: {
+                        middlewarekey: 'middlewareValue',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with two middleware and the first one sends a response directly', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    return res
+                        .header('middlewareKey', 'middlewareValue')
+                        .send('Middleware1 body');
+                };
+                const middleware2 = (req, res, next) => {
+                    return res
+                        .header('middlewareKey2', 'middlewareValue2')
+                        .send('Middleware2 body');
+                };
+                app.use(middleware);
+                app.use(middleware2);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'GET',
+                    path: '/',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: 'Middleware1 body',
+                    headers: {
+                        middlewarekey: 'middlewareValue',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with a middleware that calls next()', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    res.header('middlewareKey', 'middlewareValue');
+                    next();
+                };
+                app.use(middleware);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'GET',
+                    path: '/',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: '{"body":"Hello from alb!","headers":{"accept":"application/json"},"path":"/","method":"GET","isBase64Encoded":false,"queryStringParameters":{"query":"1234"},"params":{}}',
+                    headers: {
+                        key: 'value',
+                        key2: 'value2',
+                        middlewarekey: 'middlewareValue',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 201,
+                    statusDescription: 'Created',
                 });
             });
         });
@@ -329,6 +417,17 @@ describe('Functional unit tests?', () => {
                     isBase64Encoded: false,
                     statusCode: 500,
                 });
+            });
+        });
+        describe('When an invalid middleware is registered', () => {
+            it('Then an error is thrown', () => {
+                expect(() =>
+                    app.use((req, res) => {
+                        return 'middleware';
+                    })
+                ).toThrow(
+                    'Middlewares must contain 3 parameters (request, response, next)'
+                );
             });
         });
     });
