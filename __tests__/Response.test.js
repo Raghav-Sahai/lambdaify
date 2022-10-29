@@ -197,6 +197,42 @@ describe('Response()', () => {
                 });
             });
         });
+        describe('setHeader()', () => {
+            describe('When _response.setHeader is called with a valid key/value pair', () => {
+                const _response = new Response(event, context);
+                _response.setHeader('set-key', 'set-value');
+                it('Then _response.headers has the new header', () => {
+                    expect(_response.headers).toStrictEqual({
+                        'set-key': 'set-value',
+                    });
+                });
+            });
+            describe('When _response.setHeader is called with a valid upper case key/value pair', () => {
+                const _response = new Response(event, context);
+                _response.setHeader('UPPER-VALUE-KEY', 'UPPER-VALUE');
+                it('Then _response.headers has the new header', () => {
+                    expect(_response.headers).toStrictEqual({
+                        'upper-value-key': 'UPPER-VALUE',
+                    });
+                });
+            });
+            describe('When _response.setHeader is called without a key', () => {
+                const _response = new Response(event, context);
+                it('Then _response.headers has the new header', () => {
+                    expect(() => _response.setHeader(null, 'UPPER-VALUE')).toThrow(
+                        'Response Error: req.header must be called with two params, key and value'
+                    );
+                });
+            });
+            describe('When _response.setHeader is called without a value', () => {
+                const _response = new Response(event, context);
+                it('Then _response.headers has the new header', () => {
+                    expect(() => _response.setHeader('key', null)).toThrow(
+                        'Response Error: req.header must be called with two params, key and value'
+                    );
+                });
+            });
+        });
         describe('code()', () => {
             const _response = new Response(event, context);
             describe('When _response.code() is called with a status code', () => {

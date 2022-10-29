@@ -60,6 +60,7 @@ Response.prototype.header = function (key: string, value: string) {
 
     return this;
 };
+Response.prototype.setHeader = Response.prototype.header;
 
 Response.prototype.setSerializer = function (fn) {
     if (typeof fn !== 'function') throw SERIALIZER_MUST_BE_FUNCTION;

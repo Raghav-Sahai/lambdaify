@@ -4,7 +4,7 @@ Create lambda apis easily
 
 - inspired by [Fastify](https://github.com/fastify/fastify) and [lambda-api](https://github.com/jeremydaly/lambda-api)
 
-## Example Usage
+## Usage
 
 ```js
 // Initialize app
@@ -72,7 +72,7 @@ lambdaify.put('/delete/:id/:index', (req, res) => {
   res.send({ test: 'response' })
   ```
 
-- `res.header()`: Sets a header key value pair.  NOTE: Header keys will be converted to lowercase.
+- `res.header() | res.setHeader()`: Sets a header key value pair.  NOTE: Header keys will be converted to lowercase.
   ```js
   res.header('key', 'value')
   ```
