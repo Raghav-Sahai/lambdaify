@@ -10,14 +10,24 @@ const ROUTE_ALREADY_EXISTS_ERROR = (method: Method, path: string) =>
 const METHOD_PATH_EXTRACTION_ERROR = new Error(
     'Failed to parse event for method and path. Make sure your eventSource is set application load balancer'
 );
-const INVALID_MIDDLEWARE_PARAMS = new Error(
-    'Middlewares must contain 3 parameters (request, response, next)'
-);
+const INVALID_MIDDLEWARE_PARAMS = (param: any) =>
+    new Error(
+        `Failed to register middleware: function must contain either 3 or 4 parameters, received ${param.length}`
+    );
+const INVALID_MIDDLEWARE_PARAMS_TYPE = (param: any) =>
+    new Error(
+        `Failed to register middleware: param must be of type function, received ${typeof param}`
+    );
+const INVALID_MIDDLEWARE_PARAMS_LENGTH = (param: any, expectedLength: number) =>
+    new Error(
+        `Failed to register middleware: expected ${expectedLength} params, received ${param.length}`
+    );
 const ROUTE_NOT_FOUND = new Error('Resource not found');
 
 const router = (options: object) => {
     const router: Array<Route> = [];
     const middleware: Array<any> = [];
+    const errorMiddleware: Array<any> = [];
 
     return {
         registerRoute: (
@@ -42,11 +52,33 @@ const router = (options: object) => {
             router.push(route);
             return router;
         },
-        registerMiddleware: middlewareFn => {
-            if (middlewareFn.length !== 3) {
-                throw INVALID_MIDDLEWARE_PARAMS;
+        registerMiddleware: (...args) => {
+            if (typeof args[0] === 'function') {
+                const middlewareFn = args[0];
+                if (args.length > 1) {
+                    throw INVALID_MIDDLEWARE_PARAMS_LENGTH(args, 1);
+                }
+                if (middlewareFn.length !== 3 && middlewareFn.length !== 4) {
+                    throw INVALID_MIDDLEWARE_PARAMS(middlewareFn);
+                }
+                const path = '/*';
+                middleware.push({ middleware: middlewareFn, path });
+            } else if (typeof args[0] === 'string') {
+                const path = args[0];
+                const middlewareFn = args[1];
+                if (args.length > 2) {
+                    throw INVALID_MIDDLEWARE_PARAMS_LENGTH(args, 2);
+                }
+                if (typeof middlewareFn !== 'function') {
+                    throw INVALID_MIDDLEWARE_PARAMS_TYPE(middlewareFn);
+                }
+                if (middlewareFn.length !== 3 && middlewareFn.length !== 4) {
+                    throw INVALID_MIDDLEWARE_PARAMS(middlewareFn);
+                }
+                middleware.push({ middleware: middlewareFn, path });
+            } else {
+                throw INVALID_MIDDLEWARE_PARAMS_TYPE(args[0]);
             }
-            middleware.push(middlewareFn);
         },
         execute: async (event, context) => {
             const { method, path } = getRouteDetails(event);
@@ -54,10 +86,12 @@ const router = (options: object) => {
             if (Object.keys(matchedRoute).length === 0) {
                 return formatError(ROUTE_NOT_FOUND, 404);
             }
-            const { callback, params } = matchedRoute;
+            const { callback, params, pathArray } = matchedRoute;
             const request = new Request(event, context, params);
             const response = new Response(event, context);
-            const stack = [...middleware];
+            const matchedMiddleware = matchMiddleware(pathArray, middleware);
+            const stack = [...matchedMiddleware];
+
             stack.push(callback);
             try {
                 return await handleRun(request, response, stack);
@@ -137,6 +171,31 @@ const matchRoute = (
     }
 
     return {} as Route;
+};
+
+const matchMiddleware = (
+    pathArray: Array<string>,
+    middlewareArray: Array<any>
+): Array<any> => {
+    const matchedMiddleware = [];
+    middlewareArray.forEach(mw => {
+        const { middleware, path } = mw;
+        const middlewarePathArray = getPathArray(path);
+        let match = true;
+
+        for (const [index, fragment] of middlewarePathArray.entries()) {
+            if (fragment === pathArray[index] || fragment === '*') {
+                continue;
+            }
+            match = false;
+            break;
+        }
+        if (match) {
+            matchedMiddleware.push(middleware);
+        }
+    });
+
+    return matchedMiddleware;
 };
 
 const equals = (array1: Array<string>, array2: Array<string>): boolean =>

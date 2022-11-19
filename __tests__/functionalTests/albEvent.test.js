@@ -96,6 +96,9 @@ describe('Functional unit tests?', () => {
                     params: req.params,
                 });
         });
+        app.get('/anything/wildcardTest', (req, res) => {
+            return res.send('wildcard');
+        });
     });
     describe('Happy Paths', () => {
         describe('When app.run is called with an alb event to an existing route (/)', () => {
@@ -322,6 +325,115 @@ describe('Functional unit tests?', () => {
                 });
             });
         });
+        describe('When app.run is called with a middleware that is added for a specific path that is not matched', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    return res
+                        .header('middlewareKey', 'middlewareValue')
+                        .send('Middleware1 body');
+                };
+                app.use('/test', middleware);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'GET',
+                    path: '/',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: '{"body":"Hello from alb!","headers":{"accept":"application/json"},"path":"/","method":"GET","isBase64Encoded":false,"queryStringParameters":{"query":"1234"},"params":{}}',
+                    headers: {
+                        key: 'value',
+                        key2: 'value2',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 201,
+                    statusDescription: 'Created',
+                });
+            });
+        });
+        describe('When app.run is called with a middleware that is added for a specific path that is exact matched', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    return res
+                        .header('middlewareKey', 'middlewareValue')
+                        .send('Middleware1 body');
+                };
+                app.use('/test', middleware);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'POST',
+                    path: '/test/path',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: 'Middleware1 body',
+                    headers: {
+                        middlewarekey: 'middlewareValue',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with a middleware that is added for a specific path that is partially matched', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    return res
+                        .header('middlewareKey', 'middlewareValue')
+                        .send('Middleware1 body');
+                };
+                app.use('/test', middleware);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'PUT',
+                    path: '/test/path/1234',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: 'Middleware1 body',
+                    headers: {
+                        middlewarekey: 'middlewareValue',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
+        describe('When app.run is called with a middleware that is added for a specific path that is partially matched with a wildcard', () => {
+            it('then the correct response is returned', async () => {
+                const middleware = (req, res, next) => {
+                    return res
+                        .header('middlewareKey', 'middlewareValue')
+                        .send('Middleware1 body');
+                };
+                app.use('/*/wildcardTest', middleware);
+                const testAlbEvent = {
+                    ...albEvent,
+                    httpMethod: 'GET',
+                    path: '/anything/wildcardTest',
+                    headers: { accept: 'application/json' },
+                    queryStringParameters: { query: '1234' },
+                };
+                const response = await app.run(testAlbEvent, {});
+                expect(response).toStrictEqual({
+                    body: 'Middleware1 body',
+                    headers: {
+                        middlewarekey: 'middlewareValue',
+                    },
+                    isBase64Encoded: false,
+                    statusCode: 200,
+                    statusDescription: 'OK',
+                });
+            });
+        });
     });
     describe('Error Paths', () => {
         describe('When a duplicate route is being added to app', () => {
@@ -419,14 +531,14 @@ describe('Functional unit tests?', () => {
                 });
             });
         });
-        describe('When an invalid middleware is registered', () => {
+        describe('When an invalid middleware is registered for all routes', () => {
             it('Then an error is thrown', () => {
                 expect(() =>
                     app.use((req, res) => {
                         return 'middleware';
                     })
                 ).toThrow(
-                    'Middlewares must contain 3 parameters (request, response, next)'
+                    'Failed to register middleware: function must contain either 3 or 4 parameters, received 2'
                 );
             });
         });

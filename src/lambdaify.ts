@@ -1,14 +1,14 @@
 import { router } from './Router';
 
-const lambdaify = () => {
+const lambdaify = options => {
     const Router = router({});
 
     const lambdaify = {
         run: async (event, context) => {
             return await Router.execute(event, context);
         },
-        use: middleware => {
-            Router.registerMiddleware(middleware);
+        use: (...middleware) => {
+            Router.registerMiddleware(...middleware);
         },
         get: (path: string, callback) =>
             Router.registerRoute('GET', path, callback),
