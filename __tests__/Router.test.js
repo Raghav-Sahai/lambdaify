@@ -3,7 +3,7 @@ import { router } from '../src/Router';
 describe('Router()', () => {
     let Router;
 
-    describe('When lambdaify is initialized', () => {
+    describe('When router is initialized', () => {
         beforeEach(() => {
             Router = router({});
         });
@@ -178,6 +178,156 @@ describe('Router()', () => {
                         };
                         expect(() => Router.matchedRoute(event)).toThrow(
                             expected
+                        );
+                    });
+                });
+            });
+        });
+        describe('registerMiddleware()', () => {
+            it('Then the registerMiddleware function exists', () => {
+                expect(typeof Router.registerMiddleware).toBe('function');
+            });
+            describe('When registerMiddleware is called with the correct params', () => {
+                describe('When registerMiddleware is called with a valid function as the first parameter', () => {
+                    it('Then the middleware is successfully added', () => {
+                        const mw = (req, res, next) => {};
+                        const _middleware = Router.registerMiddleware(mw);
+                        const expected = {
+                            errorMiddleware: [],
+                            middleware: [
+                                {
+                                    middleware: mw,
+                                    path: '/*',
+                                },
+                            ],
+                        };
+                        expect(_middleware).toStrictEqual(expected);
+                    });
+                });
+                describe('When registerMiddleware is called with a valid string as the first parameter and function as the second', () => {
+                    it('Then the middleware is successfully added', () => {
+                        const mw = (req, res, next) => {};
+                        const _middleware = Router.registerMiddleware(
+                            '/path',
+                            mw
+                        );
+                        const expected = {
+                            errorMiddleware: [],
+                            middleware: [
+                                {
+                                    middleware: mw,
+                                    path: '/path',
+                                },
+                            ],
+                        };
+                        expect(_middleware).toStrictEqual(expected);
+                    });
+                });
+                describe('When registerMiddleware is called with a valid function as the first parameter and its an error middleware', () => {
+                    it('Then the middleware is successfully added', () => {
+                        const mw = (error, req, res, next) => {};
+                        const _middleware = Router.registerMiddleware(mw);
+                        const expected = {
+                            errorMiddleware: [
+                                {
+                                    middleware: mw,
+                                    path: '/*',
+                                },
+                            ],
+                            middleware: [],
+                        };
+                        expect(_middleware).toStrictEqual(expected);
+                    });
+                });
+                describe('When registerMiddleware is called with a valid string as the first parameter and function as the second and its an error middleware', () => {
+                    it('Then the middleware is successfully added', () => {
+                        const mw = (error, req, res, next) => {};
+                        const _middleware = Router.registerMiddleware(
+                            '/path',
+                            mw
+                        );
+                        const expected = {
+                            errorMiddleware: [
+                                {
+                                    middleware: mw,
+                                    path: '/path',
+                                },
+                            ],
+                            middleware: [],
+                        };
+                        expect(_middleware).toStrictEqual(expected);
+                    });
+                });
+            });
+            describe('When registerMiddleware is called with an incorrect set of params', () => {
+                describe('When register middleware is called with an unrecognized first parameter type', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware(1);
+                        }).toThrow(
+                            'Failed to register middleware: first param must be of type string or function, received number'
+                        );
+                    });
+                });
+                describe('When register middleware is called with a function as the fist param and extra params after', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware((req, res, next) => {},
+                            'extra stuff');
+                        }).toThrow(
+                            'Failed to register middleware: expected 1 params, received 2'
+                        );
+                    });
+                });
+                describe('When register middleware is called with a function that does not have 3 or 4 params', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware((req, res) => {});
+                        }).toThrow(
+                            'Failed to register middleware: function must contain either 3 or 4 parameters, received 2'
+                        );
+                    });
+                });
+                describe('When register middleware is called with a string first param and no second param', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware('/path');
+                        }).toThrow(
+                            'Failed to register middleware: second param must be of type function, received undefined'
+                        );
+                    });
+                });
+                describe('When register middleware is called with a string first param, a valid function second param, and an extra param', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware(
+                                '/path',
+                                (req, res, next) => {},
+                                'extra stuff'
+                            );
+                        }).toThrow(
+                            'Failed to register middleware: expected 2 params, received 3'
+                        );
+                    });
+                });
+                describe('When register middleware is called with a string first param and an invalid second param type', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware('/path', 'not function');
+                        }).toThrow(
+                            'Failed to register middleware: second param must be of type function, received string'
+                        );
+                    });
+                });
+                describe('When register middleware is called with a string first param and an invalid second function param that does not have 3 or 4 params', () => {
+                    it('Then an error is thrown', () => {
+                        expect(() => {
+                            Router.registerMiddleware(
+                                '/path',
+                                (req, res) => {}
+                            );
+                        }).toThrow(
+                            'Failed to register middleware: function must contain either 3 or 4 parameters, received 2'
                         );
                     });
                 });
