@@ -11,4 +11,25 @@ interface Route {
 }
 type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
-export { Param, Route, Method };
+type MiddlewareFn = (req: any, res: any, next: any) => any;
+type MiddlewareErrorFn = (error: Error, req: any, res: any, next: any) => any;
+
+interface Middleware {
+    middleware: MiddlewareFn;
+    path: string;
+}
+
+interface ErrorMiddleware {
+    middleware: MiddlewareErrorFn;
+    path: string;
+}
+
+export {
+    Param,
+    Route,
+    Method,
+    Middleware,
+    ErrorMiddleware,
+    MiddlewareFn,
+    MiddlewareErrorFn,
+};

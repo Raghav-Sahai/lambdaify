@@ -497,13 +497,14 @@ describe('Functional unit tests?', () => {
                 };
                 const response = await app.run(testAlbEvent, {});
                 expect(response).toStrictEqual({
-                    body: 'req.notRealProperty is not a function',
+                    body: '{"error":"req.notRealProperty is not a function"}',
                     headers: {
-                        'Content-Type': 'text/plain',
-                        'x-amzn-ErrorType': 500,
+                        'content-type': 'application/json',
+                        'x-amzn-errortype': 500,
                     },
                     isBase64Encoded: false,
                     statusCode: 500,
+                    statusDescription: 'Internal Server Error',
                 });
             });
         });
@@ -521,17 +522,18 @@ describe('Functional unit tests?', () => {
                 };
                 const response = await app.run(testAlbEvent, {});
                 expect(response).toStrictEqual({
-                    body: 'res.notRealProperty is not a function',
+                    body: '{"error":"res.notRealProperty is not a function"}',
                     headers: {
-                        'Content-Type': 'text/plain',
-                        'x-amzn-ErrorType': 500,
+                        'content-type': 'application/json',
+                        'x-amzn-errortype': 500,
                     },
                     isBase64Encoded: false,
                     statusCode: 500,
+                    statusDescription: 'Internal Server Error',
                 });
             });
         });
-        describe('When an invalid middleware is registered for all routes', () => {
+        describe('When an invalid middleware is registered that does not have the correct amount of function params', () => {
             it('Then an error is thrown', () => {
                 expect(() =>
                     app.use((req, res) => {
@@ -539,6 +541,64 @@ describe('Functional unit tests?', () => {
                     })
                 ).toThrow(
                     'Failed to register middleware: function must contain either 3 or 4 parameters, received 2'
+                );
+            });
+        });
+        describe('When an invalid middleware is registered that contains an extra param after the function', () => {
+            it('Then an error is thrown', () => {
+                expect(() =>
+                    app.use((req, res, next) => {
+                        return 'middleware';
+                    }, 'extra stuff')
+                ).toThrow(
+                    'Failed to register middleware: expected 1 params, received 2'
+                );
+            });
+        });
+        describe('When an invalid middleware is registered that contains a string path and a second param that is not a function', () => {
+            it('Then an error is thrown', () => {
+                expect(() => app.use('/path', 'extra stuff')).toThrow(
+                    'Failed to register middleware: second param must be of type function, received string'
+                );
+            });
+        });
+        describe('When an invalid middleware is registered that contains a string path and a second param that contains an invalid function', () => {
+            it('Then an error is thrown', () => {
+                expect(() =>
+                    app.use('/path', (req, res) => {
+                        return 'middleware';
+                    })
+                ).toThrow(
+                    'Failed to register middleware: function must contain either 3 or 4 parameters, received 2'
+                );
+            });
+        });
+        describe('When an invalid middleware is registered that contains a string path, function, and an extra param', () => {
+            it('Then an error is thrown', () => {
+                expect(() =>
+                    app.use(
+                        '/path',
+                        (req, res, next) => {
+                            return 'middleware';
+                        },
+                        'extra'
+                    )
+                ).toThrow(
+                    'Failed to register middleware: expected 2 params, received 3'
+                );
+            });
+        });
+        describe('When an invalid middleware is registered that contains a string path', () => {
+            it('Then an error is thrown', () => {
+                expect(() => app.use('/path')).toThrow(
+                    'Failed to register middleware: second param must be of type function, received undefined'
+                );
+            });
+        });
+        describe('When an invalid middleware is registered with a param that is not a function or string', () => {
+            it('Then an error is thrown', () => {
+                expect(() => app.use(1)).toThrow(
+                    'Failed to register middleware: first param must be of type string or function, received number'
                 );
             });
         });

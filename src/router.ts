@@ -1,6 +1,13 @@
 import { Request } from './Request';
 import { Response } from './Response';
-import { Method, Route } from './types/router.types';
+import {
+    Method,
+    Route,
+    Middleware,
+    ErrorMiddleware,
+    MiddlewareErrorFn,
+    MiddlewareFn,
+} from './types/router.types';
 import { getParams, getPathArray } from './utils/parsePath';
 
 const ROUTE_ALREADY_EXISTS_ERROR = (method: Method, path: string) =>
@@ -14,9 +21,13 @@ const INVALID_MIDDLEWARE_PARAMS = (param: any) =>
     new Error(
         `Failed to register middleware: function must contain either 3 or 4 parameters, received ${param.length}`
     );
-const INVALID_MIDDLEWARE_PARAMS_TYPE = (param: any) =>
+const INVALID_MIDDLEWARE_PARAMS_TYPE = (
+    param: any,
+    index: string,
+    expected: string
+) =>
     new Error(
-        `Failed to register middleware: param must be of type function, received ${typeof param}`
+        `Failed to register middleware: ${index} param must be of type ${expected}, received ${typeof param}`
     );
 const INVALID_MIDDLEWARE_PARAMS_LENGTH = (param: any, expectedLength: number) =>
     new Error(
@@ -26,8 +37,14 @@ const ROUTE_NOT_FOUND = new Error('Resource not found');
 
 const router = (options: object) => {
     const router: Array<Route> = [];
-    const middleware: Array<any> = [];
-    const errorMiddleware: Array<any> = [];
+    const middleware: Array<Middleware> = [];
+    const errorMiddleware: Array<ErrorMiddleware> = [];
+    const defaultMiddleware: MiddlewareErrorFn = (error, req, res, next) => {
+        res.status(500)
+            .header('Content-Type', 'application/json')
+            .header('x-amzn-ErrorType', 500)
+            .send({ error: error.message });
+    };
 
     return {
         registerRoute: (
@@ -62,7 +79,13 @@ const router = (options: object) => {
                     throw INVALID_MIDDLEWARE_PARAMS(middlewareFn);
                 }
                 const path = '/*';
-                middleware.push({ middleware: middlewareFn, path });
+
+                if (middlewareFn.length === 3) {
+                    middleware.push({ middleware: middlewareFn, path });
+                }
+                if (middlewareFn.length === 4) {
+                    errorMiddleware.push({ middleware: middlewareFn, path });
+                }
             } else if (typeof args[0] === 'string') {
                 const path = args[0];
                 const middlewareFn = args[1];
@@ -70,15 +93,30 @@ const router = (options: object) => {
                     throw INVALID_MIDDLEWARE_PARAMS_LENGTH(args, 2);
                 }
                 if (typeof middlewareFn !== 'function') {
-                    throw INVALID_MIDDLEWARE_PARAMS_TYPE(middlewareFn);
+                    throw INVALID_MIDDLEWARE_PARAMS_TYPE(
+                        middlewareFn,
+                        'second',
+                        'function'
+                    );
                 }
                 if (middlewareFn.length !== 3 && middlewareFn.length !== 4) {
                     throw INVALID_MIDDLEWARE_PARAMS(middlewareFn);
                 }
-                middleware.push({ middleware: middlewareFn, path });
+
+                if (middlewareFn.length === 3) {
+                    middleware.push({ middleware: middlewareFn, path });
+                }
+                if (middlewareFn.length === 4) {
+                    errorMiddleware.push({ middleware: middlewareFn, path });
+                }
             } else {
-                throw INVALID_MIDDLEWARE_PARAMS_TYPE(args[0]);
+                throw INVALID_MIDDLEWARE_PARAMS_TYPE(
+                    args[0],
+                    'first',
+                    'string or function'
+                );
             }
+            return { middleware, errorMiddleware };
         },
         execute: async (event, context) => {
             const { method, path } = getRouteDetails(event);
@@ -91,12 +129,18 @@ const router = (options: object) => {
             const response = new Response(event, context);
             const matchedMiddleware = matchMiddleware(pathArray, middleware);
             const stack = [...matchedMiddleware];
-
             stack.push(callback);
+
             try {
                 return await handleRun(request, response, stack);
-            } catch (err) {
-                return formatError(err, 500);
+            } catch (error) {
+                const matchedErrorMiddleware = matchMiddleware(
+                    pathArray,
+                    errorMiddleware
+                );
+                const errorStack = [...matchedErrorMiddleware];
+                errorStack.push(defaultMiddleware);
+                return await handleError(error, request, response, errorStack);
             }
         },
         matchedRoute: event => {
@@ -109,13 +153,28 @@ const router = (options: object) => {
 const handleRun = async (request: any, response: any, stack: Array<any>) => {
     // TODO: Fix this next() logic
     const next = () => ({});
+    for (const fn of stack) {
+        if (fn.length === 3) {
+            await fn(request, response, next);
+        } else {
+            await fn(request, response);
+        }
+        if (response.isResponseSent) {
+            return response.createResponse();
+        }
+    }
+};
+
+const handleError = async (
+    error: Error,
+    request: any,
+    response: any,
+    errorStack: Array<any>
+) => {
+    const next = () => ({});
     try {
-        for (const fn of stack) {
-            if (fn.length === 3) {
-                await fn(request, response, next);
-            } else {
-                await fn(request, response);
-            }
+        for (const fn of errorStack) {
+            await fn(error, request, response, next);
             if (response.isResponseSent) {
                 return response.createResponse();
             }
@@ -137,7 +196,7 @@ const formatError = (error: Error, statusCode: number) => {
     };
 };
 
-const getRouteDetails = event => {
+const getRouteDetails = (event: any) => {
     const { httpMethod, path } = event;
     if (!httpMethod || !path) {
         throw METHOD_PATH_EXTRACTION_ERROR;
@@ -175,8 +234,8 @@ const matchRoute = (
 
 const matchMiddleware = (
     pathArray: Array<string>,
-    middlewareArray: Array<any>
-): Array<any> => {
+    middlewareArray: Array<Middleware> | Array<ErrorMiddleware>
+): Array<MiddlewareFn> | Array<MiddlewareErrorFn> => {
     const matchedMiddleware = [];
     middlewareArray.forEach(mw => {
         const { middleware, path } = mw;
@@ -198,7 +257,7 @@ const matchMiddleware = (
     return matchedMiddleware;
 };
 
-const equals = (array1: Array<string>, array2: Array<string>): boolean =>
+const equals = (array1: Array<string>, array2: Array<string>) =>
     JSON.stringify(array1) === JSON.stringify(array2);
 
 export { router };

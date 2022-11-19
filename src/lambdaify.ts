@@ -7,7 +7,7 @@ const lambdaify = options => {
         run: async (event, context) => {
             return await Router.execute(event, context);
         },
-        use: (...middleware) => {
+        use: (...middleware: any) => {
             Router.registerMiddleware(...middleware);
         },
         get: (path: string, callback) =>
