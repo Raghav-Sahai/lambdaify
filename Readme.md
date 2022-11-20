@@ -94,9 +94,9 @@ lambdaify.put('/delete/:id/:index', (req, res) => {
 
 ## Middlewares
 
-Currently, you can only add global middleware.  Method based and error middleware is to come soon!
+### Global middleware
 
-To add global middleware
+To add global middleware see the example usage below.  Global middleware will be executed before route handlers and will be executed in the order they are added.
 
 ```js
 const lambdaify = require('lambdaify')()
@@ -108,4 +108,32 @@ const middleware = (req, res, next) => {
 lambdaify.use(middleware)
 ```
 
-Global middleware will be executed before route handlers and will be executed in the order they were added.
+### Path specific middleware
+
+To add path specific middleware, see the example usage below.
+
+```js
+const lambdaify = require('lambdaify')()
+
+const middleware = (req, res, next) => {
+    res.send('Middleware')
+}
+
+lambdaify.use('/test', middleware)
+```
+
+EX: This will match all routes that start with `test` as the first path parameter like `/test/example` and `/test/example/example2`
+
+Wildcard middleware paths are also supported using the `*` symbol. Example usage is shown below
+
+```js
+const lambdaify = require('lambdaify')()
+
+const middleware = (req, res, next) => {
+    res.send('Middleware')
+}
+
+lambdaify.use('/*/example', middleware)
+```
+
+EX: This will match any routes with `example` as the second path parameter like `/test123/example` and `/anything/example/example2`
