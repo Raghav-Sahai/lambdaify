@@ -1,8 +1,10 @@
 {
     "cSpell.words": [
         "amzn",
+        "errortype",
         "eslintignore",
         "jestconfig",
+        "middlewarekey",
         "postversion",
         "preversion"
     ],

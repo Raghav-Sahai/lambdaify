@@ -500,7 +500,7 @@ describe('Functional unit tests?', () => {
                     body: '{"error":"req.notRealProperty is not a function"}',
                     headers: {
                         'content-type': 'application/json',
-                        'x-amzn-errortype': 500,
+                        'x-amzn-errortype': '500',
                     },
                     isBase64Encoded: false,
                     statusCode: 500,
@@ -525,7 +525,7 @@ describe('Functional unit tests?', () => {
                     body: '{"error":"res.notRealProperty is not a function"}',
                     headers: {
                         'content-type': 'application/json',
-                        'x-amzn-errortype': 500,
+                        'x-amzn-errortype': '500',
                     },
                     isBase64Encoded: false,
                     statusCode: 500,
