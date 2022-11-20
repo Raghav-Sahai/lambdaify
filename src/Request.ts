@@ -1,4 +1,4 @@
-import { Param } from './types/router.types';
+import { Param } from './types/types';
 import { getPathArray } from './utils/parsePath';
 import { decodeBase64 } from './utils/base64';
 

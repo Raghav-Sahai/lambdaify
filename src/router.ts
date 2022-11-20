@@ -1,5 +1,15 @@
 import { Request } from './Request';
 import { Response } from './Response';
+import { ALBResult, ALBEvent, Context } from 'aws-lambda';
+import { getParams, getPathArray } from './utils/parsePath';
+import {
+    ROUTE_ALREADY_EXISTS_ERROR,
+    METHOD_PATH_EXTRACTION_ERROR,
+    INVALID_MIDDLEWARE_PARAMS,
+    INVALID_MIDDLEWARE_PARAMS_TYPE,
+    INVALID_MIDDLEWARE_PARAMS_LENGTH,
+    ROUTE_NOT_FOUND,
+} from './errors';
 import {
     Method,
     Route,
@@ -7,42 +17,19 @@ import {
     ErrorMiddleware,
     MiddlewareErrorFn,
     MiddlewareFn,
-} from './types/router.types';
-import { getParams, getPathArray } from './utils/parsePath';
-
-const ROUTE_ALREADY_EXISTS_ERROR = (method: Method, path: string) =>
-    new Error(
-        `${method} ${path} already exists and cannot be registered again.`
-    );
-const METHOD_PATH_EXTRACTION_ERROR = new Error(
-    'Failed to parse event for method and path. Make sure your eventSource is set application load balancer'
-);
-const INVALID_MIDDLEWARE_PARAMS = (param: any) =>
-    new Error(
-        `Failed to register middleware: function must contain either 3 or 4 parameters, received ${param.length}`
-    );
-const INVALID_MIDDLEWARE_PARAMS_TYPE = (
-    param: any,
-    index: string,
-    expected: string
-) =>
-    new Error(
-        `Failed to register middleware: ${index} param must be of type ${expected}, received ${typeof param}`
-    );
-const INVALID_MIDDLEWARE_PARAMS_LENGTH = (param: any, expectedLength: number) =>
-    new Error(
-        `Failed to register middleware: expected ${expectedLength} params, received ${param.length}`
-    );
-const ROUTE_NOT_FOUND = new Error('Resource not found');
+    REQUEST,
+    RESPONSE,
+} from './types/types';
 
 const router = (options: object) => {
     const router: Array<Route> = [];
     const middleware: Array<Middleware> = [];
     const errorMiddleware: Array<ErrorMiddleware> = [];
     const defaultMiddleware: MiddlewareErrorFn = (error, req, res, next) => {
-        res.status(500)
+        return res
+            .status(500)
             .header('Content-Type', 'application/json')
-            .header('x-amzn-ErrorType', 500)
+            .header('x-amzn-ErrorType', '500')
             .send({ error: error.message });
     };
 
@@ -118,15 +105,15 @@ const router = (options: object) => {
             }
             return { middleware, errorMiddleware };
         },
-        execute: async (event, context) => {
+        execute: async (event: ALBEvent, context: Context) => {
             const { method, path } = getRouteDetails(event);
             const matchedRoute = matchRoute(router, path, method as Method);
             if (Object.keys(matchedRoute).length === 0) {
                 return formatError(ROUTE_NOT_FOUND, 404);
             }
             const { callback, params, pathArray } = matchedRoute;
-            const request = new Request(event, context, params);
-            const response = new Response(event, context);
+            const request: REQUEST = new Request(event, context, params);
+            const response: RESPONSE = new Response(event, context);
             const matchedMiddleware = matchMiddleware(pathArray, middleware);
             const stack = [...matchedMiddleware];
             stack.push(callback);
@@ -143,15 +130,18 @@ const router = (options: object) => {
                 return await handleError(error, request, response, errorStack);
             }
         },
-        matchedRoute: event => {
+        matchedRoute: (event: ALBEvent) => {
             const { method, path } = getRouteDetails(event);
             return matchRoute(router, path, method as Method);
         },
     };
 };
 
-const handleRun = async (request: any, response: any, stack: Array<any>) => {
-    // TODO: Fix this next() logic
+const handleRun = async (
+    request: REQUEST,
+    response: RESPONSE,
+    stack
+): Promise<ALBResult> => {
     const next = () => ({});
     for (const fn of stack) {
         if (fn.length === 3) {
@@ -167,10 +157,10 @@ const handleRun = async (request: any, response: any, stack: Array<any>) => {
 
 const handleError = async (
     error: Error,
-    request: any,
-    response: any,
-    errorStack: Array<any>
-) => {
+    request: REQUEST,
+    response: RESPONSE,
+    errorStack
+): Promise<ALBResult> => {
     const next = () => ({});
     try {
         for (const fn of errorStack) {

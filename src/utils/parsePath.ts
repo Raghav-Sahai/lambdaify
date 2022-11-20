@@ -1,4 +1,4 @@
-import { Param } from '../types/router.types';
+import { Param } from '../types/types';
 
 const getPathArray = (rawPath: string): Array<string> => {
     return rawPath

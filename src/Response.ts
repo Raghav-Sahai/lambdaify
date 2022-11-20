@@ -1,19 +1,12 @@
 import { getStatusDescription } from './utils/statusCodes';
 import { encodeBase64 } from './utils/base64';
-
-const RESPONSE_ALREADY_SENT = new Error(
-    'Response Error: Response was already sent'
-);
-const CODE_ERROR = new Error('Lambdaify Error: Invalid status code');
-const SERIALIZER_MUST_BE_FUNCTION = new Error(
-    'Response Error: Serializer must be of type function'
-);
-const COOKIE_MUST_BE_STRING = new Error(
-    'Response Error: Cookie must be of type string'
-);
-const INVALID_HEADER_PARAMS = new Error(
-    'Response Error: req.header must be called with two params, key and value'
-);
+import {
+    RESPONSE_ALREADY_SENT,
+    CODE_ERROR,
+    SERIALIZER_MUST_BE_FUNCTION,
+    COOKIE_MUST_BE_STRING,
+    INVALID_HEADER_PARAMS,
+} from './errors';
 
 function Response(_event, context) {
     this.event = _event;
